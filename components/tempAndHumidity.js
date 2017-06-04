@@ -1,7 +1,9 @@
 import React from 'react'
 import {Router} from 'react-router'
-import tempHumidityStore from '../stores/tempHumidity.store';
-import tempHumidityAction from '../actions/tempHumidity.action'
+import {bindActionCreators} from 'redux'
+import {connect} from 'react-redux';
+import tempHumidityActions from '../actions/tempHumidity.action'
+import axios from 'axios'
 import App from './app'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import Paper from 'material-ui/Paper'
@@ -26,20 +28,39 @@ const toggleStyle = {
 	width: '100px'
 };
 
-export default class TempAndHumidity extends React.Component{
+class TempAndHumidity extends React.Component{
 	constructor(props) {
 		super(props);
-		toggleTempHumiditySensor = toggleTempHumiditySensor.bind(this);
+		this.getTempHumidity = this.getTempHumidity.bind(this);
+		this.toggleTempHumiditySensor = this.toggleTempHumiditySensor.bind(this);
 		
-		this.state = tempHumidityStore.getState();
+		this.state = {
+			liveTempHumidity: {
+				sensor: '',
+				temperature: 0,
+				humidity: 0,
+				date: ''
+			}
+		};
+		
+		//this.getTempHumidity();
+		this.getInitialState();
 	}
 	
 	getTempHumidity(){
-		return tempHumidityAction.getTempHumidity();
+		return this.props.actions.getTempHumidity();
 	}
 	
 	toggleTempHumiditySensor(){
-		return tempHumidityAction.toggleTempHumidity();
+		return this.props.actions.toggleTempHumidity();
+	}
+	
+	getInitialState(){
+		const API_URL = 'http://localhost:3000/api';
+		axios.get(`${API_URL}/temp-humidity/get_temp_humidity`)
+				.then((response) => { this.setState({
+					liveTempHumidity: response.data
+				}) });
 	}
 	
 	render(){
@@ -52,15 +73,15 @@ export default class TempAndHumidity extends React.Component{
 							  label="status"
 							  labelPosition="right"
 							  style={toggleStyle}
-							  defaultToggled={this.state.status}
-							  onToggle={toggleTempHumiditySensor}
+							  //defaultToggled={this.state.status}
+							  onToggle={this.toggleTempHumiditySensor}
 							/>
 						</MuiThemeProvider>
 					</div>
 					<div className='tempHumidTitle'>
 						<MuiThemeProvider>
 							<Paper style={circleStyle} zDepth={3} circle={true}>
-								<span style={tempFont}>35°c</span>
+								<span style={tempFont}>{this.state.liveTempHumidity.temperature}°c</span>
 							</Paper>
 						</MuiThemeProvider>
 						<div>Temperature</div>
@@ -68,7 +89,7 @@ export default class TempAndHumidity extends React.Component{
 					<div className='tempHumidTitle'>
 						<MuiThemeProvider>
 							<Paper style={circleStyle} zDepth={3} circle={true}>
-								<span style={tempFont}>65%</span>
+								<span style={tempFont}>{this.state.liveTempHumidity.humidity}%</span>
 							</Paper>
 						</MuiThemeProvider>
 						<div>Humidity</div>
@@ -78,3 +99,13 @@ export default class TempAndHumidity extends React.Component{
 		)
 	}
 }
+
+const mapStateToProps = (state) => ({
+	liveTempHumidity: state.liveTempHumidity
+});
+
+const mapDispatchToProps = (dispatch) => ({
+    actions: bindActionCreators(tempHumidityActions, dispatch)
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(TempAndHumidity);
