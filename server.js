@@ -1,5 +1,6 @@
 var express = require("express");
 var mongoose = require("mongoose");
+var bodyParser = require('body-parser');
 var apiController = require("./apiController");
 var sensor = require("./sensor");
 var fork = require('child_process').fork;
@@ -12,6 +13,8 @@ var port = 3000;
 
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname + '/views'));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.use('/api', apiController);
 
 app.get('*', function (req, res) {

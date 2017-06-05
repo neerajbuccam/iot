@@ -15,7 +15,7 @@ function getTempHumidity(){
 }
 
 function toggleTempHumidity(){
-	return function(){
+	return function(dispatch){
 		axios.post(`${API_URL}/temp-humidity/toggle_temp_humidity`)
 		.then(response => {
 			dispatch({

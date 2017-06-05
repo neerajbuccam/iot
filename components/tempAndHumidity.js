@@ -40,8 +40,11 @@ class TempAndHumidity extends React.Component{
 				temperature: 0,
 				humidity: 0,
 				date: ''
-			}
+			},
+			climateCaptureStatus: false
 		};
+		
+		this.API_URL = 'http://192.168.1.100:3000';
 		
 		//this.getTempHumidity();
 		this.getInitialState();
@@ -52,15 +55,28 @@ class TempAndHumidity extends React.Component{
 	}
 	
 	toggleTempHumiditySensor(){
-		return this.props.actions.toggleTempHumidity();
+		axios.post(`${this.API_URL}/api/temp-humidity/toggle_temp_humidity`, {status: !this.state.climateCaptureStatus})
+			.then((res) => {
+				if(res.data.status.nModified == 1)
+					this.setState({
+						climateCaptureStatus: !this.state.climateCaptureStatus
+					})
+			});
+		//return this.props.actions.toggleTempHumidity();
 	}
 	
 	getInitialState(){
-		const API_URL = 'http://localhost:3000/api';
-		axios.get(`${API_URL}/temp-humidity/get_temp_humidity`)
-				.then((response) => { this.setState({
+		axios.get(`${this.API_URL}/api/temp-humidity/get_temp_humidity`)
+			.then((response) => { this.setState({
 					liveTempHumidity: response.data
-				}) });
+				})
+			});
+				
+		axios.get(`${this.API_URL}/api/get_controls`)
+			.then((response) => { this.setState({
+					climateCaptureStatus: response.data.temp_humidity.status
+				})
+			});		
 	}
 	
 	render(){
@@ -73,7 +89,7 @@ class TempAndHumidity extends React.Component{
 							  label="status"
 							  labelPosition="right"
 							  style={toggleStyle}
-							  //defaultToggled={this.state.status}
+							  toggled={this.state.climateCaptureStatus}
 							  onToggle={this.toggleTempHumiditySensor}
 							/>
 						</MuiThemeProvider>

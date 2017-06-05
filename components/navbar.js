@@ -17,7 +17,6 @@ export default class Navbar extends React.Component{
 		this.state = {navDrawerOpen: false};
 		this.handleClose = this.handleClose.bind(this);
 		this.handleToggle = this.handleToggle.bind(this);
-		this.gotoDashboard = this.gotoDashboard.bind(this);
 	}
 
 	handleToggle(){
@@ -28,20 +27,15 @@ export default class Navbar extends React.Component{
 		this.setState({navDrawerOpen: false});
 	}
 	
-	gotoDashboard(){
-		this.props.router.push('/');
-	}
-	
 	render(){
 		return(
 			<div>
 				<MuiThemeProvider>
 					<AppBar title={this.props.title}
 					 onLeftIconButtonTouchTap={this.handleToggle}
-					 onRightIconButtonTouchTap={this.gotoDashboard}
 					 iconElementRight={
 						<div>
-							<IconButton iconClassName="muidocs-icon-action-home" tooltip="Dashboard" />
+							<Link to="/"><IconButton iconClassName="muidocs-icon-action-home" tooltip="Dashboard" /></Link>
 							<IconMenu
 								iconButtonElement={<IconButton iconClassName="muidocs-icon-navigation-expand-more" />}
 								targetOrigin={{horizontal: 'right', vertical: 'top'}}
