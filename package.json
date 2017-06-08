@@ -13,6 +13,7 @@
     "body-parser": "^1.17.2",
     "express": "^4.15.2",
     "fbjs": "^0.8.12",
+    "lodash": "^4.17.4",
     "material-ui": "^0.18.1",
     "mongoose": "^4.9.7",
     "node-dht-sensor": "^0.0.32",

@@ -15,7 +15,7 @@ var TempHumidityModel = require('./db/tempHumidity');
 	}
 	
 	function getTempHumidity(req, res){
-		TempHumidityModel.findOne({}, {_id: 0}).sort({date: -1})
+		TempHumidityModel.find({}, {_id: 0}).sort({date: -1})
 			.exec(
 				function (err, tempHumidity) {
 					if (err)
@@ -27,19 +27,32 @@ var TempHumidityModel = require('./db/tempHumidity');
 	}
 
 	function toggleTempHumidity(req, res){
-		ControlsModel.update({'temp_humidity.status': req.body.status})
-			.exec(
-				function (err, status) {
-					if (err)
-						res.send(err);
-					else
-						res.json({status: status});
-				}
-			);
+		var update  = { 'temp_humidity.status': req.body.status };  
+		var options = { new: true, projection: { _id: 0 } }; 
+
+		ControlsModel.findOneAndUpdate({}, update, options, function(err, doc){  
+			if (err)
+				res.send(err);
+			else
+				res.json({controls: doc});
+		});
 	}
 	
-	apiRoutes.route('/get_controls').get(getControls);
+	function updateTempHumidityInterval(req, res){
+		var update  = {'temp_humidity.interval': req.body.interval, 'temp_humidity.unitIndex': req.body.unitIndex};  
+		var options = { new: true, projection: { _id: 0 } }; 
+		
+		ControlsModel.findOneAndUpdate({}, update, options, function(err, doc){  
+			if (err)
+				res.send(err);
+			else
+				res.json({controls: doc});
+		});
+	}
+	
+	apiRoutes.route('/controls/get_controls').get(getControls);
+	apiRoutes.route('/controls/toggle_temp_humidity').post(toggleTempHumidity);
+	apiRoutes.route('/controls/update_temp_humidity_interval').post(updateTempHumidityInterval);
 	apiRoutes.route('/temp-humidity/get_temp_humidity').get(getTempHumidity);
-	apiRoutes.route('/temp-humidity/toggle_temp_humidity').post(toggleTempHumidity);
 
 module.exports = apiRoutes;

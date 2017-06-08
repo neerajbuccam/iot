@@ -14,21 +14,8 @@ function getTempHumidity(){
 	}
 }
 
-function toggleTempHumidity(){
-	return function(dispatch){
-		axios.post(`${API_URL}/temp-humidity/toggle_temp_humidity`)
-		.then(response => {
-			dispatch({
-				type: 'TOGGLE_TEMP_HUMIDITY',
-				payload: response.data
-			});
-		})
-	}
-}
-
 const tempHumidityAction = {
-	getTempHumidity,
-	toggleTempHumidity
+	getTempHumidity
 };
 
 export default tempHumidityAction;

@@ -1,13 +1,22 @@
 import React from 'react'
 import {Router} from 'react-router'
 import {bindActionCreators} from 'redux'
-import {connect} from 'react-redux';
+import {connect} from 'react-redux'
+
+import store from '../store/store'
 import tempHumidityActions from '../actions/tempHumidity.action'
+import controlsActions from '../actions/controls.action'
+//import _ from 'lodash'
 import axios from 'axios'
 import App from './app'
+
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import Paper from 'material-ui/Paper'
 import Toggle from 'material-ui/Toggle'
+import TextField from 'material-ui/TextField'
+import SelectField from 'material-ui/SelectField'
+import MenuItem from 'material-ui/MenuItem'
+import RaisedButton from 'material-ui/RaisedButton'
 
 const circleStyle = {
 	height: 70,
@@ -28,76 +37,109 @@ const toggleStyle = {
 	width: '100px'
 };
 
+const intervalStyle = {
+	width: '150px'
+};
+
+const unitStyle = {
+	width: '125px',
+	top: '14px',
+	marginLeft: '20px'
+};
+
+const saveButtonStyle = {
+	marginLeft: '20px'
+};
+
 class TempAndHumidity extends React.Component{
 	constructor(props) {
 		super(props);
-		this.getTempHumidity = this.getTempHumidity.bind(this);
-		this.toggleTempHumiditySensor = this.toggleTempHumiditySensor.bind(this);
+		
+		this.toggleTempHumidity = this.toggleTempHumidity.bind(this);
+		this.handleIntervalChange = this.handleIntervalChange.bind(this);
+		this.handleIntervalUnitChange = this.handleIntervalUnitChange.bind(this);
+		this.updateInterval = this.updateInterval.bind(this);
 		
 		this.state = {
-			liveTempHumidity: {
-				sensor: '',
-				temperature: 0,
-				humidity: 0,
-				date: ''
-			},
-			climateCaptureStatus: false
+			controls: {
+				status: false,
+				interval: 0,
+				unitIndex: 0
+			}
 		};
-		
-		this.API_URL = 'http://192.168.1.100:3000';
-		
-		//this.getTempHumidity();
+	}
+	
+	componentWillMount(){	
 		this.getInitialState();
 	}
 	
-	getTempHumidity(){
-		return this.props.actions.getTempHumidity();
-	}
-	
-	toggleTempHumiditySensor(){
-		axios.post(`${this.API_URL}/api/temp-humidity/toggle_temp_humidity`, {status: !this.state.climateCaptureStatus})
-			.then((res) => {
-				if(res.data.status.nModified == 1)
-					this.setState({
-						climateCaptureStatus: !this.state.climateCaptureStatus
-					})
-			});
-		//return this.props.actions.toggleTempHumidity();
-	}
-	
 	getInitialState(){
-		axios.get(`${this.API_URL}/api/temp-humidity/get_temp_humidity`)
-			.then((response) => { this.setState({
-					liveTempHumidity: response.data
-				})
+		this.props.tempHumidityActions.getTempHumidity();
+		this.props.controlsActions.getControls();
+	}
+	
+	componentWillReceiveProps(newProps){
+		let updateFlag = false;
+		let update = {};
+			
+		if(this.props.controls.status != newProps.controls.status){
+			update.status = newProps.controls.status;
+			updateFlag = true;
+		}
+		
+		if(this.props.controls.interval != newProps.controls.interval){
+			update.interval = newProps.controls.interval;
+			updateFlag = true;
+		}
+		
+		if(this.props.controls.unitIndex != newProps.controls.unitIndex){
+			update.unitIndex = newProps.controls.unitIndex;
+			updateFlag = true;
+		}
+		
+		if(updateFlag == true){
+			let controls = Object.assign({}, this.state.controls, update);
+			this.setState({ controls });
+		}
+	}
+	
+	toggleTempHumidity(status){
+		this.props.controlsActions.toggleTempHumidity(status);
+	}
+	
+	handleIntervalChange(e){
+		let controls = Object.assign({}, this.state.controls, {
+				interval: e.target.value
 			});
-				
-		axios.get(`${this.API_URL}/api/get_controls`)
-			.then((response) => { this.setState({
-					climateCaptureStatus: response.data.temp_humidity.status
-				})
-			});		
+		this.setState({ controls });
+	}
+	
+	handleIntervalUnitChange(index){
+		let controls = Object.assign({}, this.state.controls, {
+				unitIndex: index
+			});
+		this.setState({ controls });
+	}
+	
+	updateInterval(interval, unitIndex){
+		this.props.controlsActions.updateInterval(interval, unitIndex);
 	}
 	
 	render(){
+		const {
+			tempHumidity,
+			controls,
+			tempHumidityActions,
+			controlsActions
+		} = this.props;
+		
 		return(
 			<App router={Router}>
 				<div>
-					<div className='tempHumidStatus'>
-						<MuiThemeProvider>
-							<Toggle
-							  label="status"
-							  labelPosition="right"
-							  style={toggleStyle}
-							  toggled={this.state.climateCaptureStatus}
-							  onToggle={this.toggleTempHumiditySensor}
-							/>
-						</MuiThemeProvider>
-					</div>
 					<div className='tempHumidTitle'>
 						<MuiThemeProvider>
 							<Paper style={circleStyle} zDepth={3} circle={true}>
-								<span style={tempFont}>{this.state.liveTempHumidity.temperature}°c</span>
+								<span style={tempFont}>{tempHumidity[0].temperature}°c</span>
 							</Paper>
 						</MuiThemeProvider>
 						<div>Temperature</div>
@@ -105,10 +147,53 @@ class TempAndHumidity extends React.Component{
 					<div className='tempHumidTitle'>
 						<MuiThemeProvider>
 							<Paper style={circleStyle} zDepth={3} circle={true}>
-								<span style={tempFont}>{this.state.liveTempHumidity.humidity}%</span>
+								<span style={tempFont}>{tempHumidity[0].humidity}%</span>
 							</Paper>
 						</MuiThemeProvider>
 						<div>Humidity</div>
+					</div>
+					<div className='content'>
+						<div className='pad-top-15'>
+							<MuiThemeProvider>
+								<Toggle
+								  label="status"
+								  labelPosition="right"
+								  style={toggleStyle}
+								  toggled={controls.status}
+								  onToggle={this.toggleTempHumidity.bind(null, controls.status)}
+								/>
+							</MuiThemeProvider>
+						</div>
+						<div className='pad-top-15'>
+							<MuiThemeProvider>
+								<TextField
+								  style={intervalStyle}
+								  value={this.state.controls.interval}
+								  onChange={(e) => {this.handleIntervalChange(e)}}
+								  floatingLabelText="Capture Interval"
+								/>
+							</MuiThemeProvider>
+							<MuiThemeProvider>								
+								<SelectField
+								  floatingLabelText="Unit"
+								  style={unitStyle}
+								  value={this.state.controls.unitIndex}
+								  onChange={(e, newIndex) => {this.handleIntervalUnitChange(newIndex)}}
+								  autoWidth={true}
+								>
+								  <MenuItem value={0} primaryText="Minutes" />
+								  <MenuItem value={1} primaryText="Hours" />
+								</SelectField>
+							</MuiThemeProvider>
+							<MuiThemeProvider>
+								<RaisedButton
+									style={saveButtonStyle}
+									primary={true}
+									icon={<i className="fa fa-floppy-o fa-1_5x" aria-hidden="true"></i>}
+									onTouchTap={() => {this.updateInterval(this.state.controls.interval, this.state.controls.unitIndex)}}
+								/>
+							</MuiThemeProvider>
+						</div>
 					</div>
 				</div>
 			</App>
@@ -116,12 +201,14 @@ class TempAndHumidity extends React.Component{
 	}
 }
 
-const mapStateToProps = (state) => ({
-	liveTempHumidity: state.liveTempHumidity
+const mapStateToProps = (store) => ({
+	tempHumidity: store.tempHumidityReducer.tempHumidity,
+	controls: store.controlsReducer.controls.temp_humidity
 });
 
 const mapDispatchToProps = (dispatch) => ({
-    actions: bindActionCreators(tempHumidityActions, dispatch)
+	tempHumidityActions: bindActionCreators(tempHumidityActions, dispatch),
+	controlsActions: bindActionCreators(controlsActions, dispatch)
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(TempAndHumidity);

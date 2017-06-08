@@ -19,7 +19,8 @@ var ControlsSchema = new mongoose.Schema({
 		},
 		temp_humidity: {
 			status		: Boolean,
-			interval	: Number
+			interval	: Number,
+			unitIndex	: Number
 		},
 		light_1: {
 			status		: Boolean

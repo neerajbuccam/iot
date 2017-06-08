@@ -24,8 +24,14 @@ a{ text-decoration: none; }
 	font-family: Roboto,sans-serif;
 }
 
-.tempHumidStatus{
-	margin: 25px 25px 0px;
+.content{
+	display: inline-block;
+	padding: 0 30px;
+	margin-top: 30px;
+}
+
+.pad-top-15{
+	padding-top: 15px;
 }
 
 .fa-1_5x{ font-size: 1.5em; }

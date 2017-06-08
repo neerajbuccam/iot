@@ -1,11 +1,8 @@
 import React from 'react'
 import { render } from 'react-dom'
-import { createStore, compose, applyMiddleware } from 'redux'
-import thunk from 'redux-thunk'
-import {logger} from 'redux-logger'
 import { Provider } from 'react-redux'
 import { Router, Route, browserHistory } from 'react-router'
-import reducers from './reducers/reducers'
+import store from './store/store'
 
 import App from './components/app'
 import About from './components/about'
@@ -15,7 +12,6 @@ import injectTapEventPlugin from 'react-tap-event-plugin'
 
 injectTapEventPlugin();
 
-let store = createStore(reducers, compose(applyMiddleware(thunk, logger)));
 
 render((
 	<Provider store={store}>
