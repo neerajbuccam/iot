@@ -7,49 +7,26 @@ import store from '../store/store'
 import tempHumidityActions from '../actions/tempHumidity.action'
 import controlsActions from '../actions/controls.action'
 //import _ from 'lodash'
-import axios from 'axios'
 import App from './app'
 
+import {circleStyle,
+		tempFont,
+		toggleStyle,
+		intervalStyle,
+		unitStyle,
+		saveButtonStyle,
+		subheaderStyle
+	} from '../public/componentStyles'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import Paper from 'material-ui/Paper'
+import Subheader from 'material-ui/Subheader'
+import Divider from 'material-ui/Divider'
 import Toggle from 'material-ui/Toggle'
 import TextField from 'material-ui/TextField'
 import SelectField from 'material-ui/SelectField'
 import MenuItem from 'material-ui/MenuItem'
 import RaisedButton from 'material-ui/RaisedButton'
 
-const circleStyle = {
-	height: 70,
-	width: 70,
-	margin: 10,
-	textAlign: 'center',
-	display: 'inline-block',
-	backgroundColor: 'rgb(223, 255, 171)'
-};
-
-const tempFont = {
-	fontSize: '25px',
-	position: 'relative',
-	top: '20px'
-};
-
-const toggleStyle = {
-	width: '100px'
-};
-
-const intervalStyle = {
-	width: '150px'
-};
-
-const unitStyle = {
-	width: '125px',
-	top: '14px',
-	marginLeft: '20px'
-};
-
-const saveButtonStyle = {
-	marginLeft: '20px'
-};
 
 class TempAndHumidity extends React.Component{
 	constructor(props) {
@@ -88,7 +65,10 @@ class TempAndHumidity extends React.Component{
 		}
 		
 		if(this.props.controls.interval != newProps.controls.interval){
-			update.interval = newProps.controls.interval;
+			if(newProps.controls.unitIndex == 0)
+				update.interval = (newProps.controls.interval / 60 / 1000);
+			else if(newProps.controls.unitIndex == 1)
+				update.interval = (newProps.controls.interval / 60 / 60 / 1000);
 			updateFlag = true;
 		}
 		
@@ -115,8 +95,12 @@ class TempAndHumidity extends React.Component{
 	}
 	
 	handleIntervalUnitChange(index){
-		let controls = Object.assign({}, this.state.controls, {
-				unitIndex: index
+		let { controls } = this.state;
+		let interval = (controls.unitIndex == 1) ? (controls.interval * 60) : (controls.interval / 60);
+			
+		controls = Object.assign({}, this.state.controls, {
+				unitIndex: index,
+				interval: interval
 			});
 		this.setState({ controls });
 	}
@@ -155,8 +139,15 @@ class TempAndHumidity extends React.Component{
 					<div className='content'>
 						<div className='pad-top-15'>
 							<MuiThemeProvider>
+								<Divider />
+							</MuiThemeProvider>
+							<MuiThemeProvider>
+								<Subheader style={subheaderStyle}>Auto Mode</Subheader>
+							</MuiThemeProvider>
+							<br/>
+							<MuiThemeProvider>
 								<Toggle
-								  label="status"
+								  label={ controls.status == true ? 'ON' : 'OFF' }
 								  labelPosition="right"
 								  style={toggleStyle}
 								  toggled={controls.status}
@@ -185,6 +176,7 @@ class TempAndHumidity extends React.Component{
 								  <MenuItem value={1} primaryText="Hours" />
 								</SelectField>
 							</MuiThemeProvider>
+							<br/><br/>
 							<MuiThemeProvider>
 								<RaisedButton
 									style={saveButtonStyle}

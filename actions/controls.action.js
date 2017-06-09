@@ -28,6 +28,10 @@ function toggleTempHumidity(status){
 
 function updateInterval(interval, unitIndex){
 	return function(dispatch){
+		if(unitIndex == 0)
+			interval = interval * 60 * 1000;
+		else if(unitIndex == 1)
+			interval = interval *60 * 60 * 1000;
 		axios.post(`${API_URL}/controls/update_temp_humidity_interval`, {interval: interval, unitIndex: unitIndex})
 		.then(response => {
 			dispatch({
