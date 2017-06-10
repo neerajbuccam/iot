@@ -46,34 +46,32 @@ class TempAndHumidity extends React.Component{
 		};
 	}
 	
-	componentWillMount(){	
-		this.getInitialState();
-	}
-	
-	getInitialState(){
+	componentWillMount(){
 		this.props.tempHumidityActions.getTempHumidity();
 		this.props.controlsActions.getControls();
 	}
 	
 	componentWillReceiveProps(newProps){
+		let oldControls = this.props.controls;
+		let newControls = newProps.controls;
 		let updateFlag = false;
 		let update = {};
-			
-		if(this.props.controls.status != newProps.controls.status){
-			update.status = newProps.controls.status;
+		
+		if(oldControls.status != newControls.status){
+			update.status = newControls.status;
 			updateFlag = true;
 		}
 		
-		if(this.props.controls.interval != newProps.controls.interval){
-			if(newProps.controls.unitIndex == 0)
-				update.interval = (newProps.controls.interval / 60 / 1000);
-			else if(newProps.controls.unitIndex == 1)
-				update.interval = (newProps.controls.interval / 60 / 60 / 1000);
+		if(oldControls.interval != newControls.interval){
+			if(newControls.unitIndex == 0)
+				update.interval = (newControls.interval / 60 / 1000);
+			else if(newControls.unitIndex == 1)
+				update.interval = (newControls.interval / 60 / 60 / 1000);
 			updateFlag = true;
 		}
 		
-		if(this.props.controls.unitIndex != newProps.controls.unitIndex){
-			update.unitIndex = newProps.controls.unitIndex;
+		if(oldControls.unitIndex != newControls.unitIndex){
+			update.unitIndex = newControls.unitIndex;
 			updateFlag = true;
 		}
 		
@@ -83,8 +81,9 @@ class TempAndHumidity extends React.Component{
 		}
 	}
 	
-	toggleTempHumidity(status){
-		this.props.controlsActions.toggleTempHumidity(status);
+	toggleTempHumidity(){
+		const {status} = this.state.controls;
+		this.props.tempHumidityActions.toggleTempHumidity(status);
 	}
 	
 	handleIntervalChange(e){
@@ -105,8 +104,9 @@ class TempAndHumidity extends React.Component{
 		this.setState({ controls });
 	}
 	
-	updateInterval(interval, unitIndex){
-		this.props.controlsActions.updateInterval(interval, unitIndex);
+	updateInterval(){
+		const {interval, unitIndex} = this.state.controls;
+		this.props.tempHumidityActions.updateInterval(interval, unitIndex);
 	}
 	
 	render(){
@@ -151,7 +151,7 @@ class TempAndHumidity extends React.Component{
 								  labelPosition="right"
 								  style={toggleStyle}
 								  toggled={controls.status}
-								  onToggle={this.toggleTempHumidity.bind(null, controls.status)}
+								  onToggle={this.toggleTempHumidity}
 								/>
 							</MuiThemeProvider>
 						</div>
@@ -182,7 +182,7 @@ class TempAndHumidity extends React.Component{
 									style={saveButtonStyle}
 									primary={true}
 									icon={<i className="fa fa-floppy-o fa-1_5x" aria-hidden="true"></i>}
-									onTouchTap={() => {this.updateInterval(this.state.controls.interval, this.state.controls.unitIndex)}}
+									onTouchTap={this.updateInterval}
 								/>
 							</MuiThemeProvider>
 						</div>

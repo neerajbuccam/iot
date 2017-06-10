@@ -6,6 +6,7 @@ import store from './store/store'
 
 import App from './components/app'
 import About from './components/about'
+import Foggers from './components/foggers'
 import TempAndHumidity from './components/tempAndHumidity'
 
 import injectTapEventPlugin from 'react-tap-event-plugin'
@@ -18,6 +19,7 @@ render((
 		<Router history={browserHistory}>
 			<Route path="/" component={App} />
 			<Route path="/about" component={About} />
+			<Route path="/foggers" component={Foggers} />
 			<Route path="/temp-humidity" component={TempAndHumidity} />
 		</Router>
 	</Provider>

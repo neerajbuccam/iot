@@ -2,28 +2,41 @@ var mongoose = require("mongoose");
 
 var ControlsSchema = new mongoose.Schema({
 		water_pump: {
-			status		: Boolean,
-			run_for		: Number
+			status					: Boolean,
+			run_for					: Number
 		},
 		foggers: {
-			status		: Boolean,
-			autoMode	: Boolean,
-			interval	: Number,
-			run_for		: Number
+			foggerSide1: {
+				status				: Boolean
+			},
+			foggerSide2: {
+				status				: Boolean
+			},
+			autoMode: {
+				status				: Boolean,
+				interval			: Number,
+				intervalUnitIndex	: Number,
+				runFor				: Number,
+				runForUnitIndex		: Number
+			},
+			manualMode: {
+				runFor				: Number,
+				runForUnitIndex		: Number
+			}
 		},
 		sprinklers: {
-			status		: Boolean,
-			autoMode	: Boolean,
-			interval	: Number,
-			run_for		: Number
+			status					: Boolean,
+			autoMode				: Boolean,
+			interval				: Number,
+			run_for					: Number
 		},
 		temp_humidity: {
-			status		: Boolean,
-			interval	: Number,
-			unitIndex	: Number
+			status					: Boolean,
+			interval				: Number,
+			unitIndex				: Number
 		},
 		light_1: {
-			status		: Boolean
+			status					: Boolean
 		}
 	});
 	

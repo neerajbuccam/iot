@@ -14,7 +14,8 @@ export const tempFont = {
 };
 
 export const toggleStyle = {
-	width: '100px'
+	width: '100px',
+	padding: '10px'
 };
 
 export const intervalStyle = {

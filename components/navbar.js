@@ -57,7 +57,7 @@ export default class Navbar extends React.Component{
 						<Link to="/"><MenuItem style={NavItemStyle} onTouchTap={this.handleClose}>
 							<i className="fa fa-tint fa-fw fa-1_5x" aria-hidden="true"></i> Water Pump
 						</MenuItem></Link>
-						<Link to="/"><MenuItem style={NavItemStyle} onTouchTap={this.handleClose}>
+						<Link to="/foggers"><MenuItem style={NavItemStyle} onTouchTap={this.handleClose}>
 							<i className="fa fa-shower fa-fw fa-1_5x" aria-hidden="true"></i> Foggers
 						</MenuItem></Link>
 						<Link to="/"><MenuItem style={NavItemStyle} onTouchTap={this.handleClose}>

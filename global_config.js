@@ -1,3 +1,3 @@
 export const global = {
-	app_title: "Polyhouse IOT"
+	app_title: 'Polyhouse IOT'
 };
