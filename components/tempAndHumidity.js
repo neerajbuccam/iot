@@ -8,6 +8,7 @@ import tempHumidityActions from '../actions/tempHumidity.action'
 import controlsActions from '../actions/controls.action'
 //import _ from 'lodash'
 import App from './app'
+import AutoMode from './subComponents/autoMode'
 
 import {circleStyle,
 		tempFont,
@@ -15,33 +16,46 @@ import {circleStyle,
 		intervalStyle,
 		unitStyle,
 		saveButtonStyle,
-		subheaderStyle
-	} from '../public/componentStyles'
+		headerStyle,
+		cardHeaderStyle,
+		cardHeaderTextStyle,
+		cardTextStyle,
+		itemSubheaderStyle,
+		subheaderStyle,
+		snackbarStyle,
+		snackbarBodyStyle} from '../public/componentStyles'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import Paper from 'material-ui/Paper'
 import Subheader from 'material-ui/Subheader'
-import Divider from 'material-ui/Divider'
 import Toggle from 'material-ui/Toggle'
 import TextField from 'material-ui/TextField'
 import SelectField from 'material-ui/SelectField'
 import MenuItem from 'material-ui/MenuItem'
 import RaisedButton from 'material-ui/RaisedButton'
+import Snackbar from 'material-ui/Snackbar'
+import {Card,
+		CardHeader,
+		CardText} from 'material-ui/Card'
 
 
 class TempAndHumidity extends React.Component{
 	constructor(props) {
 		super(props);
 		
-		this.toggleTempHumidity = this.toggleTempHumidity.bind(this);
+		this.toggleAutoMode = this.toggleAutoMode.bind(this);
 		this.handleIntervalChange = this.handleIntervalChange.bind(this);
 		this.handleIntervalUnitChange = this.handleIntervalUnitChange.bind(this);
-		this.updateInterval = this.updateInterval.bind(this);
+		this.resetAutoMode = this.resetAutoMode.bind(this);
 		
 		this.state = {
-			controls: {
+			snackbar: {
 				status: false,
-				interval: 0,
-				unitIndex: 0
+				message: ''
+			},
+			temp_humidity: {
+				autoMode: {
+					status: false
+				}
 			}
 		};
 	}
@@ -55,58 +69,57 @@ class TempAndHumidity extends React.Component{
 		let oldControls = this.props.controls;
 		let newControls = newProps.controls;
 		let updateFlag = false;
-		let update = {};
+		let update = {...this.state.temp_humidity};
 		
-		if(oldControls.status != newControls.status){
-			update.status = newControls.status;
+		if(oldControls.autoMode.status != newControls.autoMode.status){
+			update.autoMode.status = newControls.autoMode.status;
 			updateFlag = true;
 		}
-		
-		if(oldControls.interval != newControls.interval){
-			if(newControls.unitIndex == 0)
-				update.interval = (newControls.interval / 60 / 1000);
-			else if(newControls.unitIndex == 1)
-				update.interval = (newControls.interval / 60 / 60 / 1000);
-			updateFlag = true;
-		}
-		
-		if(oldControls.unitIndex != newControls.unitIndex){
-			update.unitIndex = newControls.unitIndex;
-			updateFlag = true;
+		if(newProps.snackbar){
+			this.setState({
+				snackbar: {
+					status: newProps.snackbar.status,
+					message: newProps.snackbar.message
+				}
+			});
 		}
 		
 		if(updateFlag == true){
-			let controls = Object.assign({}, this.state.controls, update);
-			this.setState({ controls });
+			let temp_humidity = Object.assign({}, this.state.temp_humidity, update);
+			this.setState({ temp_humidity });
 		}
 	}
 	
-	toggleTempHumidity(){
-		const {status} = this.state.controls;
-		this.props.tempHumidityActions.toggleTempHumidity(status);
+	toggleAutoMode(){
+		const {status} = this.state.temp_humidity.autoMode;
+		this.props.tempHumidityActions.toggleAutoMode(status);
 	}
 	
 	handleIntervalChange(e){
-		let controls = Object.assign({}, this.state.controls, {
+		let autoMode = Object.assign({}, this.state.temp_humidity.autoMode, {
 				interval: e.target.value
 			});
-		this.setState({ controls });
+		this.setState({ autoMode });
 	}
 	
 	handleIntervalUnitChange(index){
-		let { controls } = this.state;
-		let interval = (controls.unitIndex == 1) ? (controls.interval * 60) : (controls.interval / 60);
+		let { autoMode } = this.state.temp_humidity;
+		let interval = (autoMode.intervalUnitIndex == 1) ? (autoMode.interval * 60) : (autoMode.interval / 60);
 			
-		controls = Object.assign({}, this.state.controls, {
-				unitIndex: index,
+		autoMode = Object.assign({}, this.state.temp_humidity.autoMode, {
+				intervalUnitIndex: index,
 				interval: interval
 			});
-		this.setState({ controls });
+		this.setState({ autoMode });
 	}
 	
-	updateInterval(){
-		const {interval, unitIndex} = this.state.controls;
-		this.props.tempHumidityActions.updateInterval(interval, unitIndex);
+	resetAutoMode(autoMode){
+		const {
+			interval,
+			intervalUnitIndex
+		} = autoMode;
+		
+		this.props.tempHumidityActions.resetAutoMode(interval, intervalUnitIndex);
 	}
 	
 	render(){
@@ -119,74 +132,53 @@ class TempAndHumidity extends React.Component{
 		
 		return(
 			<App router={Router}>
-				<div>
-					<div className='tempHumidTitle'>
-						<MuiThemeProvider>
-							<Paper style={circleStyle} zDepth={3} circle={true}>
-								<span style={tempFont}>{tempHumidity[0].temperature}°c</span>
-							</Paper>
-						</MuiThemeProvider>
-						<div>Temperature</div>
-					</div>
-					<div className='tempHumidTitle'>
-						<MuiThemeProvider>
-							<Paper style={circleStyle} zDepth={3} circle={true}>
-								<span style={tempFont}>{tempHumidity[0].humidity}%</span>
-							</Paper>
-						</MuiThemeProvider>
-						<div>Humidity</div>
-					</div>
-					<div className='content'>
-						<div className='pad-top-15'>
+				<div className='content'>
+					<MuiThemeProvider>
+						<Subheader style={headerStyle}>
+							<i className="fa fa-thermometer-half fa-fw fa-1_5x" aria-hidden="true"></i> Temperature & Humidity
+						</Subheader>
+					</MuiThemeProvider>
+					<br/>
+					<div className='pad-hoz-15'>
+					<MuiThemeProvider>
+					<Card>
+						<CardText>
+						<div className='tempHumidTitle'>
 							<MuiThemeProvider>
-								<Divider />
+								<Paper style={circleStyle} zDepth={3} circle={true}>
+									<span style={tempFont}>{tempHumidity[0].temperature}°c</span>
+								</Paper>
 							</MuiThemeProvider>
-							<MuiThemeProvider>
-								<Subheader style={subheaderStyle}>Auto Mode</Subheader>
-							</MuiThemeProvider>
-							<br/>
-							<MuiThemeProvider>
-								<Toggle
-								  label={ controls.status == true ? 'ON' : 'OFF' }
-								  labelPosition="right"
-								  style={toggleStyle}
-								  toggled={controls.status}
-								  onToggle={this.toggleTempHumidity}
-								/>
-							</MuiThemeProvider>
+							<div>Temperature</div>
 						</div>
-						<div className='pad-top-15'>
+						<div className='tempHumidTitle'>
 							<MuiThemeProvider>
-								<TextField
-								  style={intervalStyle}
-								  value={this.state.controls.interval}
-								  onChange={(e) => {this.handleIntervalChange(e)}}
-								  floatingLabelText="Capture Interval"
-								/>
+								<Paper style={circleStyle} zDepth={3} circle={true}>
+									<span style={tempFont}>{tempHumidity[0].humidity}%</span>
+								</Paper>
 							</MuiThemeProvider>
-							<MuiThemeProvider>								
-								<SelectField
-								  floatingLabelText="Unit"
-								  style={unitStyle}
-								  value={this.state.controls.unitIndex}
-								  onChange={(e, newIndex) => {this.handleIntervalUnitChange(newIndex)}}
-								  autoWidth={true}
-								>
-								  <MenuItem value={0} primaryText="Minutes" />
-								  <MenuItem value={1} primaryText="Hours" />
-								</SelectField>
-							</MuiThemeProvider>
-							<br/><br/>
-							<MuiThemeProvider>
-								<RaisedButton
-									style={saveButtonStyle}
-									primary={true}
-									icon={<i className="fa fa-floppy-o fa-1_5x" aria-hidden="true"></i>}
-									onTouchTap={this.updateInterval}
-								/>
-							</MuiThemeProvider>
+							<div>Humidity</div>
 						</div>
+						</CardText>
+					</Card>
+					</MuiThemeProvider>
 					</div>
+					<br/>
+					<AutoMode
+						controls={controls}
+						toggleAutoMode={this.toggleAutoMode}
+						resetAutoMode={this.resetAutoMode}
+						runForNeeded={false}
+					/>
+					<MuiThemeProvider>
+					<Snackbar
+					  open={this.state.snackbar.status}
+					  message={this.state.snackbar.message}
+					  autoHideDuration={2000}
+					  style={snackbarStyle}
+					  bodyStyle={snackbarBodyStyle}
+					/>
+					</MuiThemeProvider>
 				</div>
 			</App>
 		)
@@ -195,7 +187,8 @@ class TempAndHumidity extends React.Component{
 
 const mapStateToProps = (store) => ({
 	tempHumidity: store.tempHumidityReducer.tempHumidity,
-	controls: store.controlsReducer.controls.temp_humidity
+	controls: store.controlsReducer.controls.temp_humidity,
+	snackbar: store.controlsReducer.controls.snackbar
 });
 
 const mapDispatchToProps = (dispatch) => ({

@@ -16,43 +16,51 @@ import {circleStyle,
 		intervalStyle,
 		unitStyle,
 		saveButtonStyle,
-		subheaderStyle
-	} from '../public/componentStyles'
+		headerStyle,
+		cardHeaderStyle,
+		cardHeaderTextStyle,
+		cardTextStyle,
+		itemSubheaderStyle,
+		subheaderStyle,
+		snackbarStyle,
+		snackbarBodyStyle} from '../public/componentStyles'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import Paper from 'material-ui/Paper'
 import Subheader from 'material-ui/Subheader'
-import Divider from 'material-ui/Divider'
 import Toggle from 'material-ui/Toggle'
 import TextField from 'material-ui/TextField'
 import SelectField from 'material-ui/SelectField'
 import MenuItem from 'material-ui/MenuItem'
 import RaisedButton from 'material-ui/RaisedButton'
+import Snackbar from 'material-ui/Snackbar'
+import {Card,
+		CardHeader,
+		CardText} from 'material-ui/Card'
 
 
 class Foggers extends React.Component{
 	constructor(props) {
 		super(props);
 		
-		this.toggleFoggerSide1 = this.toggleFoggerSide1.bind(this);
-		this.toggleFoggerSide2 = this.toggleFoggerSide2.bind(this);
+		this.toggleFogger = this.toggleFogger.bind(this);
 		this.toggleAutoMode = this.toggleAutoMode.bind(this);
 		this.resetAutoMode = this.resetAutoMode.bind(this);
+		this.toggleManualMode = this.toggleManualMode.bind(this);
 		this.startManualMode = this.startManualMode.bind(this);
 		
 		this.state = {
+			snackbar: {
+				status: false,
+				message: ''
+			},
 			foggers: {
 				foggerSide1: { status: false },
 				foggerSide2: { status: false },
 				autoMode: {
-					status: false,
-					interval: 0,
-					intervalUnitIndex: 0,
-					runFor: 0,
-					runForUnitIndex: 0
+					status: false
 				},
 				manualMode: {
-					runFor: 0,
-					runForUnitIndex: 0
+					status: false
 				}
 			}
 		};
@@ -80,31 +88,17 @@ class Foggers extends React.Component{
 			update.autoMode.status = newControls.autoMode.status;
 			updateFlag = true;
 		}
-		if(oldControls.autoMode.interval != newControls.autoMode.interval){
-			update.autoMode.interval = (newControls.autoMode.intervalUnitIndex == 0)
-				? (newControls.autoMode.interval / 60 / 1000)
-				: (newControls.autoMode.interval / 60 / 60 / 1000);
+		if(oldControls.manualMode.status != newControls.manualMode.status){
+			update.manualMode.status = newControls.manualMode.status;
 			updateFlag = true;
 		}
-		if(oldControls.autoMode.intervalUnitIndex != newControls.autoMode.intervalUnitIndex){
-			update.autoMode.intervalUnitIndex = newControls.autoMode.intervalUnitIndex;
-			updateFlag = true;
-		}
-		if(oldControls.autoMode.runFor != newControls.autoMode.runFor){
-			update.autoMode.runFor = newControls.autoMode.runFor;
-			updateFlag = true;
-		}
-		if(oldControls.autoMode.runForUnitIndex != newControls.autoMode.runForUnitIndex){
-			update.autoMode.runForUnitIndex = newControls.autoMode.runForUnitIndex;
-			updateFlag = true;
-		}
-		if(oldControls.manualMode.runFor != newControls.manualMode.runFor){
-			update.manualMode.runFor = newControls.manualMode.runFor;
-			updateFlag = true;
-		}
-		if(oldControls.manualMode.runForUnitIndex != newControls.manualMode.runForUnitIndex){
-			update.manualMode.runForUnitIndex = newControls.manualMode.runForUnitIndex;
-			updateFlag = true;
+		if(newProps.snackbar){
+			this.setState({
+				snackbar: {
+					status: newProps.snackbar.status,
+					message: newProps.snackbar.message
+				}
+			});
 		}
 		
 		if(updateFlag == true){
@@ -113,14 +107,11 @@ class Foggers extends React.Component{
 		}
 	}
 	
-	toggleFoggerSide1(){
-		const {status} = this.state.foggers.foggerSide1;
-		this.props.foggersActions.toggleFogger(status, 1);
-	}
-	
-	toggleFoggerSide2(){
-		const {status} = this.state.foggers.foggerSide2;
-		this.props.foggersActions.toggleFogger(status, 2);
+	toggleFogger(side){
+		const {status} = (side == 'side1')
+			? this.state.foggers.foggerSide1
+			: this.state.foggers.foggerSide2;
+		this.props.foggersActions.toggleFogger(status, side);
 	}
 	
 	toggleAutoMode(){
@@ -128,14 +119,29 @@ class Foggers extends React.Component{
 		this.props.foggersActions.toggleAutoMode(status);
 	}
 	
-	resetAutoMode(){
-		const {status, interval, intervalUnitIndex, runFor, runForUnitIndex} = this.state.autoMode;	
-		this.props.foggersActions.resetAutoMode(status, interval, intervalUnitIndex, runFor, runForUnitIndex);
+	resetAutoMode(autoMode){
+		const {
+			interval,
+			intervalUnitIndex,
+			runFor,
+			runForUnitIndex
+		} = autoMode;
+		
+		this.props.foggersActions.resetAutoMode(interval, intervalUnitIndex, runFor, runForUnitIndex);
 	}
 	
-	startManualMode(){
-		const {runFor} = this.state.foggers.manualMode;
-		this.props.foggersActions.startManualMode(runFor);
+	toggleManualMode(){
+		const {status} = this.state.foggers.manualMode;
+		this.props.foggersActions.toggleManualMode(status);
+	}
+	
+	startManualMode(manualMode){
+		const {
+			runFor,
+			runForUnitIndex
+		} = manualMode;
+		
+		this.props.foggersActions.startManualMode(runFor, runForUnitIndex);
 	}
 	
 	render(){
@@ -143,41 +149,74 @@ class Foggers extends React.Component{
 		
 		return(
 			<App router={Router}>
-				<div>
-					<div className='content'>
+				<div className='content'>
+					<MuiThemeProvider>
+						<Subheader style={headerStyle}>
+							<i className="fa fa-shower fa-fw fa-1_5x" aria-hidden="true"></i> Foggers
+						</Subheader>
+					</MuiThemeProvider>
+					<br/>
+					<div className='pad-hoz-15'>
+					<MuiThemeProvider>
+					<Card>
+						<CardText>
 						<div className='width50'>
+							<MuiThemeProvider>
+								<Subheader style={itemSubheaderStyle}>Section 1</Subheader>
+							</MuiThemeProvider>
 							<br/>
-							<span>Fogger Side 1</span>
 							<MuiThemeProvider>
 								<Toggle
 								  label={ controls.foggerSide1.status == true ? 'ON' : 'OFF' }
 								  labelPosition="right"
 								  style={toggleStyle}
 								  toggled={controls.foggerSide1.status}
-								  onToggle={this.toggleFoggerSide1}
+								  onToggle={() => this.toggleFogger('side1')}
 								/>
 							</MuiThemeProvider>
 						</div>
 						<div className='width50'>
-							<span>Fogger Side 2</span>
+							<MuiThemeProvider>
+								<Subheader style={itemSubheaderStyle}>Section 2</Subheader>
+							</MuiThemeProvider>
+							<br/>
 							<MuiThemeProvider>
 								<Toggle
 								  label={ controls.foggerSide2.status == true ? 'ON' : 'OFF' }
 								  labelPosition="right"
 								  style={toggleStyle}
 								  toggled={controls.foggerSide2.status}
-								  onToggle={this.toggleFoggerSide2}
+								  onToggle={() => this.toggleFogger('side2')}
 								/>
 							</MuiThemeProvider>
 						</div>
-						<AutoMode
-							controls={controls}
-							toggleAutoMode={this.toggleAutoMode}
-						/>
-						<ManualMode
-							startManualMode={this.startManualMode}
-						/>
+						</CardText>
+					</Card>
+					</MuiThemeProvider>
 					</div>
+					<br/>
+					<AutoMode
+						controls={controls}
+						toggleAutoMode={this.toggleAutoMode}
+						resetAutoMode={this.resetAutoMode}
+						runForNeeded={true}
+					/>
+					<br/>
+					<ManualMode
+						controls={controls}
+						startManualMode={this.startManualMode}
+						toggleManualMode={this.toggleManualMode}
+					/>
+					<br/>
+					<MuiThemeProvider>
+					<Snackbar
+					  open={this.state.snackbar.status}
+					  message={this.state.snackbar.message}
+					  autoHideDuration={2000}
+					  style={snackbarStyle}
+					  bodyStyle={snackbarBodyStyle}
+					/>
+					</MuiThemeProvider>
 				</div>
 			</App>
 		)
@@ -185,7 +224,8 @@ class Foggers extends React.Component{
 }
 
 const mapStateToProps = (store) => ({
-	controls: store.controlsReducer.controls.foggers
+	controls: store.controlsReducer.controls.foggers,
+	snackbar: store.controlsReducer.controls.snackbar
 });
 
 const mapDispatchToProps = (dispatch) => ({

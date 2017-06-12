@@ -17,6 +17,7 @@ const initialState = {
 				runForUnitIndex: 0
 			},
 			manualMode: {
+				status: false,
 				runFor: 0,
 				runForUnitIndex: 0
 			}
@@ -28,9 +29,11 @@ const initialState = {
 			run_for: 0
 		},
 		temp_humidity: {
-			status: false,
-			interval: 0,
-			unitIndex: 0
+			autoMode: {
+				status: false,
+				interval: 0,
+				intervalUnitIndex: 0
+			}
 		},
 		light_1: {
 			status: false
@@ -47,12 +50,6 @@ export default function controlsReducer(state = initialState, action) {
 			break;
 		}
 		case 'TOGGLE_TEMP_HUMIDITY': {
-			return Object.assign({}, ...state.controls, {
-				controls: action.payload
-			})
-			break;
-		}
-		case 'UPDATE_TEMP_HUMIDITY_INTERVAL': {
 			return Object.assign({}, ...state.controls, {
 				controls: action.payload
 			})
@@ -78,7 +75,29 @@ export default function controlsReducer(state = initialState, action) {
 		}
 		case 'RESET_AUTO_MODE': {
 			return Object.assign({}, ...state.controls, {
+				controls: Object.assign({}, action.payload, {
+					snackbar: {
+						status: true,
+						message: 'Auto Mode Reset Successful'
+					}
+				})
+			})
+			break;
+		}
+		case 'TOGGLE_MANUAL_MODE': {
+			return Object.assign({}, ...state.controls, {
 				controls: action.payload
+			})
+			break;
+		}
+		case 'START_MANUAL_MODE': {
+			return Object.assign({}, ...state.controls, {
+				controls: Object.assign({}, action.payload, {
+					snackbar: {
+						status: true,
+						message: 'Manual Mode Started'
+					}
+				})
 			})
 			break;
 		}

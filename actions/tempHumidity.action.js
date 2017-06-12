@@ -14,9 +14,9 @@ function getTempHumidity(){
 	}
 }
 
-function toggleTempHumidity(status){
+function toggleAutoMode(status){
 	return function(dispatch){
-		axios.post(`${API_URL}/controls/toggle_temp_humidity`, {status: !status})
+		axios.post(`${API_URL}/controls/tempHumidity_toggleAutoMode`, {status: !status})
 		.then(response => {
 			dispatch({
 				type: 'TOGGLE_TEMP_HUMIDITY',
@@ -26,14 +26,14 @@ function toggleTempHumidity(status){
 	}
 }
 
-function updateInterval(interval, unitIndex){
+function resetAutoMode(interval, intervalUnitIndex){
 	return function(dispatch){
-		interval = (unitIndex == 0) ? (interval * 60 * 1000) : (interval *60 * 60 * 1000);
-		
-		axios.post(`${API_URL}/controls/update_temp_humidity_interval`, {interval: interval, unitIndex: unitIndex})
+		interval = (intervalUnitIndex == 0) ? (interval * 60 * 1000) : (interval *60 * 60 * 1000);
+
+		axios.post(`${API_URL}/controls/temp_humidity_resetAutoMode`, {interval: interval, intervalUnitIndex: intervalUnitIndex})
 		.then(response => {
 			dispatch({
-				type: 'UPDATE_TEMP_HUMIDITY_INTERVAL',
+				type: 'RESET_AUTO_MODE',
 				payload: response.data.controls
 			});
 		});
@@ -42,8 +42,8 @@ function updateInterval(interval, unitIndex){
 
 const tempHumidityAction = {
 	getTempHumidity,
-	toggleTempHumidity,
-	updateInterval
+	toggleAutoMode,
+	resetAutoMode
 };
 
 export default tempHumidityAction;

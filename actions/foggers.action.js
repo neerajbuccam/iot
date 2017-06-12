@@ -6,16 +6,16 @@ function toggleFogger(status, side){
 	return function(dispatch){
 		axios.post(`${API_URL}/controls/toggle_fogger`, {status: !status, side: side})
 		.then(response => {
-			if(side == 1){
+			if(side == 'side1'){
 				dispatch({
 					type: 'TOGGLE_FOGGER_1',
-					payload: response.data.controls.foggers.foggerSide1.status
+					payload: response.data.controls
 				});
 			}
-			else if(side == 2){
+			else if(side == 'side2'){
 				dispatch({
 					type: 'TOGGLE_FOGGER_2',
-					payload: response.data.controls.foggers.foggerSide2.status
+					payload: response.data.controls
 				});
 			}
 		});
@@ -34,20 +34,50 @@ function toggleAutoMode(status){
 	}
 }
 
-function resetAutoMode(status, interval, intervalUnitIndex, runFor, runForUnitIndex){
+function resetAutoMode(interval, intervalUnitIndex, runFor, runForUnitIndex){
 	return function(dispatch){
 		interval = (intervalUnitIndex == 0) ? (interval * 60 * 1000) : (interval *60 * 60 * 1000);
 		runFor = (runForUnitIndex == 0) ? (runFor * 60 * 1000) : (runFor *60 * 60 * 1000);
 		
-		axios.post(`${API_URL}/controls/fogger_toggleAutoMode`, {
-			status: !status,
+		axios.post(`${API_URL}/controls/fogger_resetAutoMode`, {
 			interval: interval,
-			runFor: runFor
-			})
+			intervalUnitIndex: intervalUnitIndex,
+			runFor: runFor,
+			runForUnitIndex: runForUnitIndex
+		})
 		.then(response => {
 			dispatch({
 				type: 'RESET_AUTO_MODE',
-				payload: true
+				payload: response.data.controls
+			});
+		});
+	}
+}
+
+function toggleManualMode(status){
+	return function(dispatch){
+		axios.post(`${API_URL}/controls/fogger_toggleManualMode`, { status: !status })
+		.then(response => {
+			dispatch({
+				type: 'TOGGLE_MANUAL_MODE',
+				payload: response.data.controls
+			});
+		});
+	}
+}
+
+function startManualMode(runFor, runForUnitIndex){
+	return function(dispatch){
+		runFor = (runForUnitIndex == 0) ? (runFor * 60 * 1000) : (runFor *60 * 60 * 1000);
+		
+		axios.post(`${API_URL}/controls/fogger_startManualMode`, {
+			runFor: runFor,
+			runForUnitIndex: runForUnitIndex
+		})
+		.then(response => {
+			dispatch({
+				type: 'START_MANUAL_MODE',
+				payload: response.data.controls
 			});
 		});
 	}
@@ -56,7 +86,9 @@ function resetAutoMode(status, interval, intervalUnitIndex, runFor, runForUnitIn
 const foggersAction = {
 	toggleFogger,
 	toggleAutoMode,
-	resetAutoMode
+	resetAutoMode,
+	toggleManualMode,
+	startManualMode
 };
 
 export default foggersAction;

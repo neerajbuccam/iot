@@ -20,6 +20,7 @@ var ControlsSchema = new mongoose.Schema({
 				runForUnitIndex		: Number
 			},
 			manualMode: {
+				status				: Boolean,
 				runFor				: Number,
 				runForUnitIndex		: Number
 			}
@@ -31,9 +32,11 @@ var ControlsSchema = new mongoose.Schema({
 			run_for					: Number
 		},
 		temp_humidity: {
-			status					: Boolean,
-			interval				: Number,
-			unitIndex				: Number
+			autoMode: {
+				status				: Boolean,
+				interval			: Number,
+				intervalUnitIndex	: Number
+			}
 		},
 		light_1: {
 			status					: Boolean

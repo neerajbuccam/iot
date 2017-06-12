@@ -26,13 +26,17 @@ a{ text-decoration: none; }
 
 .content{
 	display: inline-block;
-	padding: 0 30px;
-	margin-top: 30px;
+	margin: 20px 0;
+	width: 100%;
 }
 
-.pad-top-15{
-	padding-top: 15px;
+.pad-hoz-15{
+	padding: 0 15px;
 }
+
+.text-right{ text-align: right; }
+
+.text-center{ text-align: center; }
 
 .fa-1_5x{ font-size: 1.5em; }
 
