@@ -7,8 +7,6 @@ import {circleStyle,
 		unitStyle,
 		saveButtonStyle,
 		headerStyle,
-		cardHeaderStyle,
-		cardHeaderTextStyle,
 		cardTextStyle,
 		itemSubheaderStyle,
 		subheaderStyle} from '../../public/componentStyles'
@@ -93,8 +91,7 @@ class ManualMode extends React.Component{
 			<div className='pad-hoz-15'>
 			<MuiThemeProvider>
 				<Card expanded={controls.manualMode.status} >
-					<CardHeader
-					  title={
+					<CardText>
 						<div>
 							<MuiThemeProvider>
 								<Subheader style={subheaderStyle}>Manual Mode</Subheader>
@@ -109,12 +106,7 @@ class ManualMode extends React.Component{
 								/>
 							</MuiThemeProvider>
 						</div>
-					  }
-					  actAsExpander={true}
-					  showExpandableButton={false}
-					  style={cardHeaderStyle}
-					  textStyle={cardHeaderTextStyle}
-					/>
+					</CardText>
 					<CardText expandable={true} style={cardTextStyle}>
 					<div className='text-center'>
 						<MuiThemeProvider>

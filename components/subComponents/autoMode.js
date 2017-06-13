@@ -7,8 +7,6 @@ import {circleStyle,
 		unitStyle,
 		saveButtonStyle,
 		headerStyle,
-		cardHeaderStyle,
-		cardHeaderTextStyle,
 		cardTextStyle,
 		itemSubheaderStyle,
 		subheaderStyle} from '../../public/componentStyles'
@@ -128,9 +126,8 @@ class AutoMode extends React.Component{
 			<div className='pad-hoz-15'>
 			<MuiThemeProvider>
 				<Card expanded={controls.autoMode.status} >
-					<CardHeader
-					  title={
-						<div>
+					<CardText>
+						  <div>
 							<MuiThemeProvider>
 								<Subheader style={subheaderStyle}>Auto Mode</Subheader>
 							</MuiThemeProvider>
@@ -144,12 +141,7 @@ class AutoMode extends React.Component{
 								/>
 							</MuiThemeProvider>
 						</div>
-					  }
-					  actAsExpander={true}
-					  showExpandableButton={false}
-					  style={cardHeaderStyle}
-					  textStyle={cardHeaderTextStyle}
-					/>
+					</CardText>
 					<CardText expandable={true} style={cardTextStyle}>
 						<div className='text-center'>
 							<MuiThemeProvider>

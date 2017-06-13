@@ -17,8 +17,6 @@ import {circleStyle,
 		unitStyle,
 		saveButtonStyle,
 		headerStyle,
-		cardHeaderStyle,
-		cardHeaderTextStyle,
 		cardTextStyle,
 		itemSubheaderStyle,
 		subheaderStyle,
@@ -63,6 +61,7 @@ class TempAndHumidity extends React.Component{
 	componentWillMount(){
 		this.props.tempHumidityActions.getTempHumidity();
 		this.props.controlsActions.getControls();
+		this.justLoaded = true;
 	}
 	
 	componentWillReceiveProps(newProps){
@@ -71,7 +70,7 @@ class TempAndHumidity extends React.Component{
 		let updateFlag = false;
 		let update = {...this.state.temp_humidity};
 		
-		if(oldControls.autoMode.status != newControls.autoMode.status){
+		if(this.justLoaded || oldControls.autoMode.status != newControls.autoMode.status){
 			update.autoMode.status = newControls.autoMode.status;
 			updateFlag = true;
 		}

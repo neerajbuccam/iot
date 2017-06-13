@@ -17,8 +17,6 @@ import {circleStyle,
 		unitStyle,
 		saveButtonStyle,
 		headerStyle,
-		cardHeaderStyle,
-		cardHeaderTextStyle,
 		cardTextStyle,
 		itemSubheaderStyle,
 		subheaderStyle,
@@ -68,6 +66,7 @@ class Foggers extends React.Component{
 	
 	componentWillMount(){
 		this.props.controlsActions.getControls();
+		this.justLoaded = true;
 	}
 	
 	componentWillReceiveProps(newProps){
@@ -76,19 +75,20 @@ class Foggers extends React.Component{
 		let updateFlag = false;
 		let update = {...this.state.foggers};
 		
-		if(oldControls.foggerSide1.status != newControls.foggerSide1.status){
+		if(this.justLoaded || oldControls.foggerSide1.status != newControls.foggerSide1.status){
 			update.foggerSide1.status = newControls.foggerSide1.status;
 			updateFlag = true;
 		}
-		if(oldControls.foggerSide2.status != newControls.foggerSide2.status){
+		if(this.justLoaded || oldControls.foggerSide2.status != newControls.foggerSide2.status){
 			update.foggerSide2.status = newControls.foggerSide2.status;
 			updateFlag = true;
 		}
-		if(oldControls.autoMode.status != newControls.autoMode.status){
+		if(this.justLoaded || oldControls.autoMode.status != newControls.autoMode.status){
 			update.autoMode.status = newControls.autoMode.status;
 			updateFlag = true;
 		}
-		if(oldControls.manualMode.status != newControls.manualMode.status){
+		console.log(update);
+		if(this.justLoaded || oldControls.manualMode.status != newControls.manualMode.status){
 			update.manualMode.status = newControls.manualMode.status;
 			updateFlag = true;
 		}

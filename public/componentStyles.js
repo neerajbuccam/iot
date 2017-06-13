@@ -62,15 +62,6 @@ export const subheaderStyle = {
 	width: '50%'
 };
 
-export const cardHeaderStyle = {
-	padding: '16px 16px 0'
-};
-
-export const cardHeaderTextStyle = {
-	padding: '0',
-    width: '100%'
-};
-
 export const cardTextStyle = {
 	display: 'block',
 	padding: '0 16px'
