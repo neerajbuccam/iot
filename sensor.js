@@ -1,6 +1,6 @@
 var sensorLib = require("node-dht-sensor");
 var gpio = require("rpi-gpio");
-var TempHumidityModel = require('./db/tempHumidity');
+var TempHumidityModel = require('./models/tempHumidity');
 
 var sensor = {
     sensors: [ {

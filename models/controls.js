@@ -26,10 +26,24 @@ var ControlsSchema = new mongoose.Schema({
 			}
 		},
 		sprinklers: {
-			status					: Boolean,
-			autoMode				: Boolean,
-			interval				: Number,
-			run_for					: Number
+			sprinklerSide1: {
+				status				: Boolean
+			},
+			sprinklerSide2: {
+				status				: Boolean
+			},
+			autoMode: {
+				status				: Boolean,
+				interval			: Number,
+				intervalUnitIndex	: Number,
+				runFor				: Number,
+				runForUnitIndex		: Number
+			},
+			manualMode: {
+				status				: Boolean,
+				runFor				: Number,
+				runForUnitIndex		: Number
+			}
 		},
 		temp_humidity: {
 			autoMode: {

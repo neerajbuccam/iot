@@ -28,9 +28,13 @@ function toggleAutoMode(status){
 
 function resetAutoMode(interval, intervalUnitIndex){
 	return function(dispatch){
+		let args = {
+				interval: interval,
+				intervalUnitIndex: intervalUnitIndex
+			};
 		interval = (intervalUnitIndex == 0) ? (interval * 60 * 1000) : (interval *60 * 60 * 1000);
 
-		axios.post(`${API_URL}/controls/temp_humidity_resetAutoMode`, {interval: interval, intervalUnitIndex: intervalUnitIndex})
+		axios.post(`${API_URL}/controls/temp_humidity_resetAutoMode`, {interval: interval, intervalUnitIndex: intervalUnitIndex, args: args})
 		.then(response => {
 			dispatch({
 				type: 'RESET_AUTO_MODE',

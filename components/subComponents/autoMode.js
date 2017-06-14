@@ -41,29 +41,33 @@ class AutoMode extends React.Component{
 		};
 	}
 	
+	componentWillMount(){
+		this.justLoaded = true;
+	}
+	
 	componentWillReceiveProps(newProps){
 		let oldControls = this.props.controls;
 		let newControls = newProps.controls;
 		let updateFlag = false;
 		let update = {...this.state};
 		
-		if(oldControls.autoMode.interval != newControls.autoMode.interval){
+		if(this.justLoaded || oldControls.autoMode.interval != newControls.autoMode.interval){
 			update.autoMode.interval = (newControls.autoMode.intervalUnitIndex == 0)
 				? (newControls.autoMode.interval / 60 / 1000)
 				: (newControls.autoMode.interval / 60 / 60 / 1000);
 			updateFlag = true;
 		}
-		if(oldControls.autoMode.intervalUnitIndex != newControls.autoMode.intervalUnitIndex){
+		if(this.justLoaded || oldControls.autoMode.intervalUnitIndex != newControls.autoMode.intervalUnitIndex){
 			update.autoMode.intervalUnitIndex = newControls.autoMode.intervalUnitIndex;
 			updateFlag = true;
 		}
-		if(oldControls.autoMode.runFor != newControls.autoMode.runFor){
+		if(this.justLoaded || oldControls.autoMode.runFor != newControls.autoMode.runFor){
 			update.autoMode.runFor = (newControls.autoMode.runForUnitIndex == 0)
 				? (newControls.autoMode.runFor / 60 / 1000)
 				: (newControls.autoMode.runFor / 60 / 60 / 1000);
 			updateFlag = true;
 		}
-		if(oldControls.autoMode.runForUnitIndex != newControls.autoMode.runForUnitIndex){
+		if(this.justLoaded || oldControls.autoMode.runForUnitIndex != newControls.autoMode.runForUnitIndex){
 			update.autoMode.runForUnitIndex = newControls.autoMode.runForUnitIndex;
 			updateFlag = true;
 		}

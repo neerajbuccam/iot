@@ -37,19 +37,23 @@ class ManualMode extends React.Component{
 		};
 	}
 	
+	componentWillMount(){
+		this.justLoaded = true;
+	}
+	
 	componentWillReceiveProps(newProps){
 		let oldControls = this.props.controls;
 		let newControls = newProps.controls;
 		let updateFlag = false;
 		let update = {...this.state};
 		
-		if(oldControls.manualMode.runFor != newControls.manualMode.runFor){
+		if(this.justLoaded || oldControls.manualMode.runFor != newControls.manualMode.runFor){
 			update.manualMode.runFor = (newControls.manualMode.runForUnitIndex == 0)
 				? (newControls.manualMode.runFor / 60 / 1000)
 				: (newControls.manualMode.runFor / 60 / 60 / 1000);
 			updateFlag = true;
 		}
-		if(oldControls.manualMode.runForUnitIndex != newControls.manualMode.runForUnitIndex){
+		if(this.justLoaded || oldControls.manualMode.runForUnitIndex != newControls.manualMode.runForUnitIndex){
 			update.manualMode.runForUnitIndex = newControls.manualMode.runForUnitIndex;
 			updateFlag = true;
 		}

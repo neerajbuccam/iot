@@ -45,6 +45,7 @@ class Foggers extends React.Component{
 		this.resetAutoMode = this.resetAutoMode.bind(this);
 		this.toggleManualMode = this.toggleManualMode.bind(this);
 		this.startManualMode = this.startManualMode.bind(this);
+		this.setSnackbarOff = this.setSnackbarOff.bind(this);
 		
 		this.state = {
 			snackbar: {
@@ -87,7 +88,6 @@ class Foggers extends React.Component{
 			update.autoMode.status = newControls.autoMode.status;
 			updateFlag = true;
 		}
-		console.log(update);
 		if(this.justLoaded || oldControls.manualMode.status != newControls.manualMode.status){
 			update.manualMode.status = newControls.manualMode.status;
 			updateFlag = true;
@@ -105,6 +105,16 @@ class Foggers extends React.Component{
 			let foggers = Object.assign({}, this.state, update);
 			this.setState({ foggers });
 		}
+	}
+	
+	setSnackbarOff(){
+		this.setState({
+			snackbar: {
+				status: false,
+				message: ''
+			}
+		});
+		console.log('closed');
 	}
 	
 	toggleFogger(side){
@@ -213,6 +223,7 @@ class Foggers extends React.Component{
 					  open={this.state.snackbar.status}
 					  message={this.state.snackbar.message}
 					  autoHideDuration={2000}
+					  onRequestClose={this.setSnackbarOff}
 					  style={snackbarStyle}
 					  bodyStyle={snackbarBodyStyle}
 					/>

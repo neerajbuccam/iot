@@ -6678,15 +6678,6 @@ var subheaderStyle = exports.subheaderStyle = {
 	width: '50%'
 };
 
-var cardHeaderStyle = exports.cardHeaderStyle = {
-	padding: '16px 16px 0'
-};
-
-var cardHeaderTextStyle = exports.cardHeaderTextStyle = {
-	padding: '0',
-	width: '100%'
-};
-
 var cardTextStyle = exports.cardTextStyle = {
 	display: 'block',
 	padding: '0 16px'
@@ -14456,9 +14447,13 @@ function toggleAutoMode(status) {
 
 function resetAutoMode(interval, intervalUnitIndex) {
 	return function (dispatch) {
+		var args = {
+			interval: interval,
+			intervalUnitIndex: intervalUnitIndex
+		};
 		interval = intervalUnitIndex == 0 ? interval * 60 * 1000 : interval * 60 * 60 * 1000;
 
-		_axios2.default.post(API_URL + '/controls/temp_humidity_resetAutoMode', { interval: interval, intervalUnitIndex: intervalUnitIndex }).then(function (response) {
+		_axios2.default.post(API_URL + '/controls/temp_humidity_resetAutoMode', { interval: interval, intervalUnitIndex: intervalUnitIndex, args: args }).then(function (response) {
 			dispatch({
 				type: 'RESET_AUTO_MODE',
 				payload: response.data.controls
@@ -14559,6 +14554,11 @@ var AutoMode = function (_React$Component) {
 	}
 
 	_createClass(AutoMode, [{
+		key: 'componentWillMount',
+		value: function componentWillMount() {
+			this.justLoaded = true;
+		}
+	}, {
 		key: 'componentWillReceiveProps',
 		value: function componentWillReceiveProps(newProps) {
 			var oldControls = this.props.controls;
@@ -14566,19 +14566,19 @@ var AutoMode = function (_React$Component) {
 			var updateFlag = false;
 			var update = _extends({}, this.state);
 
-			if (oldControls.autoMode.interval != newControls.autoMode.interval) {
+			if (this.justLoaded || oldControls.autoMode.interval != newControls.autoMode.interval) {
 				update.autoMode.interval = newControls.autoMode.intervalUnitIndex == 0 ? newControls.autoMode.interval / 60 / 1000 : newControls.autoMode.interval / 60 / 60 / 1000;
 				updateFlag = true;
 			}
-			if (oldControls.autoMode.intervalUnitIndex != newControls.autoMode.intervalUnitIndex) {
+			if (this.justLoaded || oldControls.autoMode.intervalUnitIndex != newControls.autoMode.intervalUnitIndex) {
 				update.autoMode.intervalUnitIndex = newControls.autoMode.intervalUnitIndex;
 				updateFlag = true;
 			}
-			if (oldControls.autoMode.runFor != newControls.autoMode.runFor) {
+			if (this.justLoaded || oldControls.autoMode.runFor != newControls.autoMode.runFor) {
 				update.autoMode.runFor = newControls.autoMode.runForUnitIndex == 0 ? newControls.autoMode.runFor / 60 / 1000 : newControls.autoMode.runFor / 60 / 60 / 1000;
 				updateFlag = true;
 			}
-			if (oldControls.autoMode.runForUnitIndex != newControls.autoMode.runForUnitIndex) {
+			if (this.justLoaded || oldControls.autoMode.runForUnitIndex != newControls.autoMode.runForUnitIndex) {
 				update.autoMode.runForUnitIndex = newControls.autoMode.runForUnitIndex;
 				updateFlag = true;
 			}
@@ -14651,8 +14651,10 @@ var AutoMode = function (_React$Component) {
 					_react2.default.createElement(
 						_Card.Card,
 						{ expanded: controls.autoMode.status },
-						_react2.default.createElement(_Card.CardHeader, {
-							title: _react2.default.createElement(
+						_react2.default.createElement(
+							_Card.CardText,
+							null,
+							_react2.default.createElement(
 								'div',
 								null,
 								_react2.default.createElement(
@@ -14675,12 +14677,8 @@ var AutoMode = function (_React$Component) {
 										onToggle: toggleAutoMode
 									})
 								)
-							),
-							actAsExpander: true,
-							showExpandableButton: false,
-							style: _componentStyles.cardHeaderStyle,
-							textStyle: _componentStyles.cardHeaderTextStyle
-						}),
+							)
+						),
 						_react2.default.createElement(
 							_Card.CardText,
 							{ expandable: true, style: _componentStyles.cardTextStyle },
@@ -21546,6 +21544,7 @@ var Foggers = function (_React$Component) {
 		_this.resetAutoMode = _this.resetAutoMode.bind(_this);
 		_this.toggleManualMode = _this.toggleManualMode.bind(_this);
 		_this.startManualMode = _this.startManualMode.bind(_this);
+		_this.setSnackbarOff = _this.setSnackbarOff.bind(_this);
 
 		_this.state = {
 			snackbar: {
@@ -21570,6 +21569,7 @@ var Foggers = function (_React$Component) {
 		key: 'componentWillMount',
 		value: function componentWillMount() {
 			this.props.controlsActions.getControls();
+			this.justLoaded = true;
 		}
 	}, {
 		key: 'componentWillReceiveProps',
@@ -21579,19 +21579,19 @@ var Foggers = function (_React$Component) {
 			var updateFlag = false;
 			var update = _extends({}, this.state.foggers);
 
-			if (oldControls.foggerSide1.status != newControls.foggerSide1.status) {
+			if (this.justLoaded || oldControls.foggerSide1.status != newControls.foggerSide1.status) {
 				update.foggerSide1.status = newControls.foggerSide1.status;
 				updateFlag = true;
 			}
-			if (oldControls.foggerSide2.status != newControls.foggerSide2.status) {
+			if (this.justLoaded || oldControls.foggerSide2.status != newControls.foggerSide2.status) {
 				update.foggerSide2.status = newControls.foggerSide2.status;
 				updateFlag = true;
 			}
-			if (oldControls.autoMode.status != newControls.autoMode.status) {
+			if (this.justLoaded || oldControls.autoMode.status != newControls.autoMode.status) {
 				update.autoMode.status = newControls.autoMode.status;
 				updateFlag = true;
 			}
-			if (oldControls.manualMode.status != newControls.manualMode.status) {
+			if (this.justLoaded || oldControls.manualMode.status != newControls.manualMode.status) {
 				update.manualMode.status = newControls.manualMode.status;
 				updateFlag = true;
 			}
@@ -21608,6 +21608,17 @@ var Foggers = function (_React$Component) {
 				var foggers = Object.assign({}, this.state, update);
 				this.setState({ foggers: foggers });
 			}
+		}
+	}, {
+		key: 'setSnackbarOff',
+		value: function setSnackbarOff() {
+			this.setState({
+				snackbar: {
+					status: false,
+					message: ''
+				}
+			});
+			console.log('closed');
 		}
 	}, {
 		key: 'toggleFogger',
@@ -21767,6 +21778,7 @@ var Foggers = function (_React$Component) {
 							open: this.state.snackbar.status,
 							message: this.state.snackbar.message,
 							autoHideDuration: 2000,
+							onRequestClose: this.setSnackbarOff,
 							style: _componentStyles.snackbarStyle,
 							bodyStyle: _componentStyles.snackbarBodyStyle
 						})
@@ -21922,6 +21934,7 @@ var TempAndHumidity = function (_React$Component) {
 		value: function componentWillMount() {
 			this.props.tempHumidityActions.getTempHumidity();
 			this.props.controlsActions.getControls();
+			this.justLoaded = true;
 		}
 	}, {
 		key: 'componentWillReceiveProps',
@@ -21931,7 +21944,7 @@ var TempAndHumidity = function (_React$Component) {
 			var updateFlag = false;
 			var update = _extends({}, this.state.temp_humidity);
 
-			if (oldControls.autoMode.status != newControls.autoMode.status) {
+			if (this.justLoaded || oldControls.autoMode.status != newControls.autoMode.status) {
 				update.autoMode.status = newControls.autoMode.status;
 				updateFlag = true;
 			}
@@ -23378,6 +23391,11 @@ var ManualMode = function (_React$Component) {
 	}
 
 	_createClass(ManualMode, [{
+		key: 'componentWillMount',
+		value: function componentWillMount() {
+			this.justLoaded = true;
+		}
+	}, {
 		key: 'componentWillReceiveProps',
 		value: function componentWillReceiveProps(newProps) {
 			var oldControls = this.props.controls;
@@ -23385,11 +23403,11 @@ var ManualMode = function (_React$Component) {
 			var updateFlag = false;
 			var update = _extends({}, this.state);
 
-			if (oldControls.manualMode.runFor != newControls.manualMode.runFor) {
+			if (this.justLoaded || oldControls.manualMode.runFor != newControls.manualMode.runFor) {
 				update.manualMode.runFor = newControls.manualMode.runForUnitIndex == 0 ? newControls.manualMode.runFor / 60 / 1000 : newControls.manualMode.runFor / 60 / 60 / 1000;
 				updateFlag = true;
 			}
-			if (oldControls.manualMode.runForUnitIndex != newControls.manualMode.runForUnitIndex) {
+			if (this.justLoaded || oldControls.manualMode.runForUnitIndex != newControls.manualMode.runForUnitIndex) {
 				update.manualMode.runForUnitIndex = newControls.manualMode.runForUnitIndex;
 				updateFlag = true;
 			}
@@ -23440,8 +23458,10 @@ var ManualMode = function (_React$Component) {
 					_react2.default.createElement(
 						_Card.Card,
 						{ expanded: controls.manualMode.status },
-						_react2.default.createElement(_Card.CardHeader, {
-							title: _react2.default.createElement(
+						_react2.default.createElement(
+							_Card.CardText,
+							null,
+							_react2.default.createElement(
 								'div',
 								null,
 								_react2.default.createElement(
@@ -23464,12 +23484,8 @@ var ManualMode = function (_React$Component) {
 										onToggle: toggleManualMode
 									})
 								)
-							),
-							actAsExpander: true,
-							showExpandableButton: false,
-							style: _componentStyles.cardHeaderStyle,
-							textStyle: _componentStyles.cardHeaderTextStyle
-						}),
+							)
+						),
 						_react2.default.createElement(
 							_Card.CardText,
 							{ expandable: true, style: _componentStyles.cardTextStyle },
