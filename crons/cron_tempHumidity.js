@@ -11,11 +11,11 @@ var exec = require('child_process').execFile
 var interval = process.argv[2];
 var intervalUnitIndex = process.argv[3];
 
-var interval_In_Seconds = (intervalUnitIndex == 0)
+var interval_In_mSeconds = (intervalUnitIndex == 0)
 	? interval * 60 * 1000
 	: interval * 60 * 60 * 1000;
 
-if (typeof(interval_In_Seconds) == 'number' && interval_In_Seconds >= 5000) {
+if (typeof(interval_In_mSeconds) == 'number' && interval_In_mSeconds >= 5000) {
 	
 	setInterval( function(){
 		
@@ -48,5 +48,5 @@ if (typeof(interval_In_Seconds) == 'number' && interval_In_Seconds >= 5000) {
 			}
 		);
 		
-	}, interval_In_Seconds);
+	}, interval_In_mSeconds);
 }

@@ -90,7 +90,10 @@ fork = require('child_process').fork;
 	}
 	
 	function tempHumidityResetAutoMode(req, res){
-		var update  = {'temp_humidity.autoMode.interval': req.body.interval, 'temp_humidity.autoMode.intervalUnitIndex': req.body.intervalUnitIndex};  
+		var update  = {
+			'temp_humidity.autoMode.interval': req.body.interval,
+			'temp_humidity.autoMode.intervalUnitIndex': req.body.intervalUnitIndex
+		};  
 		var options = { new: true, projection: { _id: 0 } };
 		var args = req.body.args;
 		
@@ -151,8 +154,21 @@ fork = require('child_process').fork;
 		ControlsModel.findOneAndUpdate({}, update, options, function(err, doc){  
 			if (err)
 				res.send(err);
-			else
+			else{
+				var args = [
+					req.body.args.interval,
+					req.body.args.intervalUnitIndex,
+					req.body.args.runFor,
+					req.body.args.runForUnitIndex
+				];
+				
+				doc.cron = createCron('foggers.autoMode.process',
+					'./crons/cron_foggers.js',
+					args
+				);
+				
 				res.json({controls: doc});
+			}
 		});
 	}
 	

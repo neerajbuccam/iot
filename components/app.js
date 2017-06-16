@@ -1,7 +1,8 @@
 import React from 'react'
 import Navbar from './navbar'
+import Footer from './footer'
 import {Router} from 'react-router'
-import {global} from '../global_config'
+var global = require('../global_config')
 
 export default class App extends React.Component{
 	render(){
@@ -9,6 +10,7 @@ export default class App extends React.Component{
 			<div>
 				<Navbar router={Router} title={global.app_title} />
 				{this.props.children}
+				<Footer/>
 			</div>
 		)
 	}

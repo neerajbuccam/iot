@@ -36,6 +36,12 @@ function toggleAutoMode(status){
 
 function resetAutoMode(interval, intervalUnitIndex, runFor, runForUnitIndex){
 	return function(dispatch){
+		let args = {
+				interval: interval,
+				intervalUnitIndex: intervalUnitIndex,
+				runFor: runFor,
+				runForUnitIndex: runForUnitIndex
+			};
 		interval = (intervalUnitIndex == 0) ? (interval * 60 * 1000) : (interval *60 * 60 * 1000);
 		runFor = (runForUnitIndex == 0) ? (runFor * 60 * 1000) : (runFor *60 * 60 * 1000);
 		
@@ -43,7 +49,8 @@ function resetAutoMode(interval, intervalUnitIndex, runFor, runForUnitIndex){
 			interval: interval,
 			intervalUnitIndex: intervalUnitIndex,
 			runFor: runFor,
-			runForUnitIndex: runForUnitIndex
+			runForUnitIndex: runForUnitIndex,
+			args: args
 		})
 		.then(response => {
 			dispatch({

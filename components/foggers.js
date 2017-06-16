@@ -204,14 +204,12 @@ class Foggers extends React.Component{
 					</Card>
 					</MuiThemeProvider>
 					</div>
-					<br/>
 					<AutoMode
 						controls={controls}
 						toggleAutoMode={this.toggleAutoMode}
 						resetAutoMode={this.resetAutoMode}
 						runForNeeded={true}
 					/>
-					<br/>
 					<ManualMode
 						controls={controls}
 						startManualMode={this.startManualMode}

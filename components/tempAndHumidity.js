@@ -162,13 +162,13 @@ class TempAndHumidity extends React.Component{
 					</Card>
 					</MuiThemeProvider>
 					</div>
-					<br/>
 					<AutoMode
 						controls={controls}
 						toggleAutoMode={this.toggleAutoMode}
 						resetAutoMode={this.resetAutoMode}
 						runForNeeded={false}
 					/>
+					<br/>
 					<MuiThemeProvider>
 					<Snackbar
 					  open={this.state.snackbar.status}
