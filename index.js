@@ -7,7 +7,9 @@ import store from './store/store'
 import App from './components/app'
 import About from './components/about'
 import Foggers from './components/foggers'
+import Sprinklers from './components/sprinklers'
 import TempAndHumidity from './components/tempAndHumidity'
+import Extras from './components/extras'
 
 import injectTapEventPlugin from 'react-tap-event-plugin'
 
@@ -20,7 +22,9 @@ render((
 			<Route path="/" component={App} />
 			<Route path="/about" component={About} />
 			<Route path="/foggers" component={Foggers} />
+			<Route path="/sprinklers" component={Sprinklers} />
 			<Route path="/temp-humidity" component={TempAndHumidity} />
+			<Route path="/extras" component={Extras} />
 		</Router>
 	</Provider>
 ), document.getElementById('app'))

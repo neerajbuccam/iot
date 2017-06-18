@@ -1,10 +1,6 @@
 var mongoose = require("mongoose");
 
 var ControlsSchema = new mongoose.Schema({
-		water_pump: {
-			status					: Boolean,
-			run_for					: Number
-		},
 		foggers: {
 			foggerSide1: {
 				status				: Boolean
@@ -52,7 +48,13 @@ var ControlsSchema = new mongoose.Schema({
 				intervalUnitIndex	: Number
 			}
 		},
-		light_1: {
+		water_pump: {
+			status					: Boolean
+		},
+		lights_1: {
+			status					: Boolean
+		},
+		lights_2: {
 			status					: Boolean
 		}
 	});

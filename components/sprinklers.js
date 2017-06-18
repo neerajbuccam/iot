@@ -4,7 +4,7 @@ import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
 
 import store from '../store/store'
-import foggersActions from '../actions/foggers.action'
+import sprinklersActions from '../actions/sprinklers.action'
 import controlsActions from '../actions/controls.action'
 import App from './app'
 import AutoMode from './subComponents/autoMode'
@@ -36,11 +36,11 @@ import {Card,
 		CardText} from 'material-ui/Card'
 
 
-class Foggers extends React.Component{
+class Sprinklers extends React.Component{
 	constructor(props) {
 		super(props);
 		
-		this.toggleFogger = this.toggleFogger.bind(this);
+		this.toggleSprinkler = this.toggleSprinkler.bind(this);
 		this.toggleAutoMode = this.toggleAutoMode.bind(this);
 		this.resetAutoMode = this.resetAutoMode.bind(this);
 		this.toggleManualMode = this.toggleManualMode.bind(this);
@@ -52,9 +52,9 @@ class Foggers extends React.Component{
 				status: false,
 				message: ''
 			},
-			foggers: {
-				foggerSide1: { status: false },
-				foggerSide2: { status: false },
+			sprinklers: {
+				sprinklerSide1: { status: false },
+				sprinklerSide2: { status: false },
 				autoMode: {
 					status: false
 				},
@@ -74,14 +74,14 @@ class Foggers extends React.Component{
 		let oldControls = this.props.controls;
 		let newControls = newProps.controls;
 		let updateFlag = false;
-		let update = {...this.state.foggers};
+		let update = {...this.state.sprinklers};
 		
-		if(this.justLoaded || oldControls.foggerSide1.status != newControls.foggerSide1.status){
-			update.foggerSide1.status = newControls.foggerSide1.status;
+		if(this.justLoaded || oldControls.sprinklerSide1.status != newControls.sprinklerSide1.status){
+			update.sprinklerSide1.status = newControls.sprinklerSide1.status;
 			updateFlag = true;
 		}
-		if(this.justLoaded || oldControls.foggerSide2.status != newControls.foggerSide2.status){
-			update.foggerSide2.status = newControls.foggerSide2.status;
+		if(this.justLoaded || oldControls.sprinklerSide2.status != newControls.sprinklerSide2.status){
+			update.sprinklerSide2.status = newControls.sprinklerSide2.status;
 			updateFlag = true;
 		}
 		if(this.justLoaded || oldControls.autoMode.status != newControls.autoMode.status){
@@ -102,8 +102,8 @@ class Foggers extends React.Component{
 		}
 		
 		if(updateFlag == true){
-			let foggers = Object.assign({}, this.state, update);
-			this.setState({ foggers });
+			let sprinklers = Object.assign({}, this.state, update);
+			this.setState({ sprinklers });
 		}
 	}
 	
@@ -116,16 +116,16 @@ class Foggers extends React.Component{
 		});
 	}
 	
-	toggleFogger(side){
+	toggleSprinkler(side){
 		const {status} = (side == 'side1')
-			? this.state.foggers.foggerSide1
-			: this.state.foggers.foggerSide2;
-		this.props.foggersActions.toggleFogger(status, side);
+			? this.state.sprinklers.sprinklerSide1
+			: this.state.sprinklers.sprinklerSide2;
+		this.props.sprinklersActions.toggleSprinkler(status, side);
 	}
 	
 	toggleAutoMode(){
-		const {status} = this.state.foggers.autoMode;
-		this.props.foggersActions.toggleAutoMode(status);
+		const {status} = this.state.sprinklers.autoMode;
+		this.props.sprinklersActions.toggleAutoMode(status);
 	}
 	
 	resetAutoMode(autoMode){
@@ -136,12 +136,12 @@ class Foggers extends React.Component{
 			runForUnitIndex
 		} = autoMode;
 		
-		this.props.foggersActions.resetAutoMode(interval, intervalUnitIndex, runFor, runForUnitIndex);
+		this.props.sprinklersActions.resetAutoMode(interval, intervalUnitIndex, runFor, runForUnitIndex);
 	}
 	
 	toggleManualMode(){
-		const {status} = this.state.foggers.manualMode;
-		this.props.foggersActions.toggleManualMode(status);
+		const {status} = this.state.sprinklers.manualMode;
+		this.props.sprinklersActions.toggleManualMode(status);
 	}
 	
 	startManualMode(manualMode){
@@ -150,7 +150,7 @@ class Foggers extends React.Component{
 			runForUnitIndex
 		} = manualMode;
 		
-		this.props.foggersActions.startManualMode(runFor, runForUnitIndex);
+		this.props.sprinklersActions.startManualMode(runFor, runForUnitIndex);
 	}
 	
 	render(){
@@ -161,7 +161,7 @@ class Foggers extends React.Component{
 				<div className='content'>
 					<MuiThemeProvider>
 						<Subheader style={headerStyle}>
-							<i className="fa fa-shower fa-fw fa-1_5x" aria-hidden="true"></i> Foggers
+							<i className="fa fa-superpowers fa-fw fa-1_5x" aria-hidden="true"></i> Sprinklers
 						</Subheader>
 					</MuiThemeProvider>
 					<br/>
@@ -176,11 +176,11 @@ class Foggers extends React.Component{
 							<br/>
 							<MuiThemeProvider>
 								<Toggle
-								  label={ controls.foggerSide1.status == true ? 'ON' : 'OFF' }
+								  label={ controls.sprinklerSide1.status == true ? 'ON' : 'OFF' }
 								  labelPosition="right"
 								  style={toggleStyle}
-								  toggled={controls.foggerSide1.status}
-								  onToggle={() => this.toggleFogger('side1')}
+								  toggled={controls.sprinklerSide1.status}
+								  onToggle={() => this.toggleSprinkler('side1')}
 								/>
 							</MuiThemeProvider>
 						</div>
@@ -191,11 +191,11 @@ class Foggers extends React.Component{
 							<br/>
 							<MuiThemeProvider>
 								<Toggle
-								  label={ controls.foggerSide2.status == true ? 'ON' : 'OFF' }
+								  label={ controls.sprinklerSide2.status == true ? 'ON' : 'OFF' }
 								  labelPosition="right"
 								  style={toggleStyle}
-								  toggled={controls.foggerSide2.status}
-								  onToggle={() => this.toggleFogger('side2')}
+								  toggled={controls.sprinklerSide2.status}
+								  onToggle={() => this.toggleSprinkler('side2')}
 								/>
 							</MuiThemeProvider>
 						</div>
@@ -232,13 +232,13 @@ class Foggers extends React.Component{
 }
 
 const mapStateToProps = (store) => ({
-	controls: store.controlsReducer.controls.foggers,
+	controls: store.controlsReducer.controls.sprinklers,
 	snackbar: store.controlsReducer.controls.snackbar
 });
 
 const mapDispatchToProps = (dispatch) => ({
-	foggersActions: bindActionCreators(foggersActions, dispatch),
+	sprinklersActions: bindActionCreators(sprinklersActions, dispatch),
 	controlsActions: bindActionCreators(controlsActions, dispatch)
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Foggers);
+export default connect(mapStateToProps, mapDispatchToProps)(Sprinklers);

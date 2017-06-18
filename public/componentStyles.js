@@ -45,15 +45,27 @@ export const headerStyle = {
 };
 
 export const itemSubheaderStyle = {
-	color: 'rgba(0, 12, 255, 0.5)',
+	color: 'rgba(109, 16, 102, 0.6)',
 	fontSize: '18px',
 	fontWeight: '600',
 	lineHeight: '30px',
 	fontFamily: 'Roboto,sans-serif'
 };
 
+export const moduleheaderStyle = {
+	color: 'rgba(109, 16, 102, 0.6)',
+	fontSize: '18px',
+	fontWeight: '600',
+	lineHeight: '30px',
+	fontFamily: 'Roboto,sans-serif',
+	display: 'inline-block',
+	width: 'auto',
+	minWidth: '60%',
+	padding: '0'
+};
+
 export const subheaderStyle = {
-	color: 'rgba(0, 12, 255, 0.5)',
+	color: 'rgba(109, 16, 102, 0.6)',
 	fontSize: '18px',
 	fontWeight: '600',
 	lineHeight: '30px',

@@ -54,23 +54,17 @@ export default class Navbar extends React.Component{
 					  onRequestChange={(open) => this.setState({navDrawerOpen: open})}
 					>
 						<div className="drawer-title">Controls</div>
-						<Link to="/"><MenuItem style={NavItemStyle} onTouchTap={this.handleClose}>
-							<i className="fa fa-tint fa-fw fa-1_5x" aria-hidden="true"></i> Water Pump
-						</MenuItem></Link>
 						<Link to="/foggers"><MenuItem style={NavItemStyle} onTouchTap={this.handleClose}>
 							<i className="fa fa-shower fa-fw fa-1_5x" aria-hidden="true"></i> Foggers
 						</MenuItem></Link>
-						<Link to="/"><MenuItem style={NavItemStyle} onTouchTap={this.handleClose}>
+						<Link to="/sprinklers"><MenuItem style={NavItemStyle} onTouchTap={this.handleClose}>
 							<i className="fa fa-superpowers fa-fw fa-1_5x" aria-hidden="true"></i> Sprinklers
-						</MenuItem></Link>
-						<Link to="/"><MenuItem style={NavItemStyle} onTouchTap={this.handleClose}>
-							<i className="fa fa-lightbulb-o fa-fw fa-1_5x" aria-hidden="true"></i> Lights 1
-						</MenuItem></Link>
-						<Link to="/"><MenuItem style={NavItemStyle} onTouchTap={this.handleClose}>
-							<i className="fa fa-lightbulb-o fa-fw fa-1_5x" aria-hidden="true"></i> Lights 2
 						</MenuItem></Link>
 						<Link to="/temp-humidity"><MenuItem style={NavItemStyle} onTouchTap={this.handleClose}>
 							<i className="fa fa-thermometer-half fa-fw fa-1_5x" aria-hidden="true"></i> Temp / Humdity
+						</MenuItem></Link>
+						<Link to="/extras"><MenuItem style={NavItemStyle} onTouchTap={this.handleClose}>
+							<i className="fa fa-cubes fa-fw fa-1_5x" aria-hidden="true"></i> Extras
 						</MenuItem></Link>
 					</Drawer>
 				</MuiThemeProvider>
