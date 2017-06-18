@@ -1,7 +1,4 @@
-var mongoose = require("mongoose");
-
-//	DB Connection
-mongoose.connect('mongodb://neeraj:polyhouse@ds064799.mlab.com:64799/polyhouse');
+require('../mongoConnect');
 
 var ControlsModel = require('../models/controls')
 var TempHumidityModel = require('../models/tempHumidity')

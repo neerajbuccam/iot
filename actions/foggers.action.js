@@ -75,11 +75,16 @@ function toggleManualMode(status){
 
 function startManualMode(runFor, runForUnitIndex){
 	return function(dispatch){
+		let args = {
+				runFor: runFor,
+				runForUnitIndex: runForUnitIndex
+			};
 		runFor = (runForUnitIndex == 0) ? (runFor * 60 * 1000) : (runFor *60 * 60 * 1000);
 		
 		axios.post(`${API_URL}/controls/fogger_startManualMode`, {
 			runFor: runFor,
-			runForUnitIndex: runForUnitIndex
+			runForUnitIndex: runForUnitIndex,
+			args: args
 		})
 		.then(response => {
 			dispatch({

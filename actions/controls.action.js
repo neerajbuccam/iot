@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 const API_URL = 'http://' + window.location.hostname + ':' + window.location.port + '/api';
-//const API_URL = 'http://localhost:3000/api';
 
 function getControls(){
 	return function(dispatch){

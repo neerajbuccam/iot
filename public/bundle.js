@@ -9137,7 +9137,6 @@ var _axios2 = _interopRequireDefault(_axios);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var API_URL = 'http://' + window.location.hostname + ':' + window.location.port + '/api';
-//const API_URL = 'http://localhost:3000/api';
 
 function getControls() {
 	return function (dispatch) {
@@ -23121,11 +23120,16 @@ function toggleManualMode(status) {
 
 function startManualMode(runFor, runForUnitIndex) {
 	return function (dispatch) {
+		var args = {
+			runFor: runFor,
+			runForUnitIndex: runForUnitIndex
+		};
 		runFor = runForUnitIndex == 0 ? runFor * 60 * 1000 : runFor * 60 * 60 * 1000;
 
 		_axios2.default.post(API_URL + '/controls/fogger_startManualMode', {
 			runFor: runFor,
-			runForUnitIndex: runForUnitIndex
+			runForUnitIndex: runForUnitIndex,
+			args: args
 		}).then(function (response) {
 			dispatch({
 				type: 'START_MANUAL_MODE',

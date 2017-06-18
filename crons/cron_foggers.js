@@ -1,58 +1,88 @@
-//	DB Connection
-var mongoose = require("mongoose");
-mongoose.connect('mongodb://neeraj:polyhouse@ds064799.mlab.com:64799/polyhouse');
+require('../mongoConnect');
 
 var global = require('../global_config')
 var gpio = require("rpi-gpio")
 var ControlsModel = require('../models/controls')
 var exec = require('child_process').execFile
 
+var SIGTERM = false;
+
 var foggerSide1 = global.pins.foggerSide1;
 var foggerSide2 = global.pins.foggerSide2;
 
-var autoModeStatus = false;
-var isFirstRun = true;
-
-var interval = process.argv[2];
-var intervalUnitIndex = process.argv[3];
-var runFor = process.argv[4];
-var runForUnitIndex = process.argv[5];
-
-var interval_In_mSeconds = (intervalUnitIndex == 0)
-	? interval * 60 * 1000
-	: interval * 60 * 60 * 1000;
+var modeStatus = false;
+var mode = process.argv[2];
+var runFor = process.argv[3];
+var runForUnitIndex = process.argv[4];
 	
 var runFor_In_mSeconds = (runForUnitIndex == 0)
 	? runFor * 60 * 1000
 	: runFor * 60 * 60 * 1000;
+
+if (mode == 'autoMode') {
+	var interval = process.argv[5];
+	var intervalUnitIndex = process.argv[6];
 	
+	var interval_In_mSeconds = (intervalUnitIndex == 0)
+		? interval * 60 * 1000
+		: interval * 60 * 60 * 1000;
+}
+
 var half_runFor_In_mSeconds = parseInt(runFor_In_mSeconds / 2);
+
+var dbQuery = 'foggers.' + mode + '.status';
 	
-function togglePin(pin, direction, data){
+function toggleFogger(side, data){
+	var update = {};
+	side == 'side1' ? update['foggers.foggerSide1.status'] = data : null;
+	side == 'side2' ? update['foggers.foggerSide2.status'] = data : null;
+
+	var options = { new: true, projection: { _id: 0 } };
+	ControlsModel.findOneAndUpdate({}, update, options, function(){});
+}
+
+function togglePin(pin, side, direction, data){
 /*	var d = (direction == 'in') ? gpio.DIR_IN : gpio.DIR_OUT;
 	gpio.setup(pin, d, function(){
 		gpio.write(pin, data, function(err) {
 			if (err)
 				console.log('error: ' + err);
-*/			console.log('FOGGERS PIN ' + pin + ' is ' + ((data == 1) ? 'ON' : 'OFF'));
+			
+*/			if (!SIGTERM)
+				toggleFogger(side, data);
+			console.log('FOGGERS PIN ' + pin + ' is ' + (data ? 'ON' : 'OFF'));
 /*		});
 	});
 */
 }
 
 function terminateScript(){
-	togglePin(foggerSide1, 'in', 0);
-	togglePin(foggerSide2, 'in', 0);
-	console.log('Killing Process (Auto is OFF / Timeout): ', process.pid);
+	SIGTERM = true;
+	togglePin(foggerSide1, 'side1', 'in', false);
+	togglePin(foggerSide2, 'side2', 'in', false);
 	exec('kill', [process.pid]);
 }
 
+process.on('SIGTERM', function() {
+	var update = {
+		'foggers.foggerSide1.status': false,
+		'foggers.foggerSide2.status': false
+	};
+	
+	ControlsModel.findOneAndUpdate({}, update, function(err){
+		if (err)
+			console.log(err);
+		console.log('Killing Process (Auto is OFF / Timeout): ', process.pid);
+		process.exit(0);
+	});
+});
+
 //	Listen to Auto Mode Status every 5 seconds and Terminate Script if false
 setInterval(function(){
-	ControlsModel.distinct('foggers.autoMode.status').exec(
+	ControlsModel.distinct(dbQuery).exec(
 		function (err, status) {
-			autoModeStatus = status[0];
-			if (!autoModeStatus)
+			modeStatus = status[0];
+			if (!modeStatus)
 				terminateScript();
 		}
 	);
@@ -60,26 +90,26 @@ setInterval(function(){
 
 //	Foggers toggle process
 function start(){
-	ControlsModel.distinct('foggers.autoMode.status').exec(
+	ControlsModel.distinct(dbQuery).exec(
 		function (err, status) {
-			autoModeStatus = status[0];
-			if (autoModeStatus) {
-				if (isFirstRun) {
-					togglePin(foggerSide1, 'in', 0);
-					togglePin(foggerSide2, 'in', 0);
-					togglePin(foggerSide1, 'in', 1);
-					isFirstRun = false;
+			modeStatus = status[0];
+			if (modeStatus) {
+				togglePin(foggerSide1, 'side1', 'in', false);
+				togglePin(foggerSide2, 'side2', 'in', false);
+				togglePin(foggerSide1, 'side1', 'in', true);
+				
+				setTimeout(function(){
+					togglePin(foggerSide1, 'side1', 'in', false);
+					togglePin(foggerSide2, 'side2', 'in', true);
+				}, half_runFor_In_mSeconds);
+				
+				setTimeout(function(){
+					togglePin(foggerSide2, 'side2', 'in', false);
 					
-					setTimeout(function(){
-						togglePin(foggerSide1, 'in', 0);
-						isFirstRun = true;
-						togglePin(foggerSide2, 'in', 1);
-					}, half_runFor_In_mSeconds);
-					
-					setTimeout(function(){
-						togglePin(foggerSide2, 'in', 0);
-					}, runFor_In_mSeconds);
-				}
+					if (mode == 'manualMode')
+						terminateScript();
+				}, runFor_In_mSeconds);
+				
 			}
 			else {
 				terminateScript();
@@ -88,12 +118,14 @@ function start(){
 	);
 }
 
-if ((typeof(interval_In_mSeconds) == 'number' && interval_In_mSeconds >= 5000)
-	&& (typeof(runFor_In_mSeconds) == 'number' && runFor_In_mSeconds >= 5000)) {
+if (typeof(runFor_In_mSeconds) == 'number' && runFor_In_mSeconds >= 5000) {
 
 	start();
 	
-	setInterval(function(){
-		start();
-	}, interval_In_mSeconds);
+	if (mode == 'autoMode' && (typeof(interval_In_mSeconds) == 'number' && interval_In_mSeconds >= 5000)) {
+		setInterval(function(){
+			start();
+		}, interval_In_mSeconds);
+	}
+	
 }

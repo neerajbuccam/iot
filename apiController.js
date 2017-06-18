@@ -23,27 +23,30 @@ fork = require('child_process').fork;
 	function killCron(module){
 		CronModel.distinct(module).exec(
 			function (err, cron) {
-				console.log('Killing Process: ', cron[0]);
 				exec('kill', [cron[0]]);
+				console.log('Killing Process: ', cron[0]);
 			}
 		);
 	}
 
-	function createCron(update_module, path, args){
-		
-		killCron(update_module);
-		
-		var forkProcess = fork(path, args);
-		
-		console.log('Creating Process: ', forkProcess.pid);
-		
-		var update= {};
-		update[update_module] = forkProcess.pid;
-		var options = { new: true, projection: { _id: 0 } };
+	function processCron(update_module, path, args){
+		CronModel.distinct(update_module).exec(
+			function (err, cron) {
+				exec('kill', [cron[0]]);
+				console.log('Killing Process: ', cron[0]);
+				
+				var forkProcess = fork(path, args);
+				console.log('Creating Process: ', forkProcess.pid);
+				
+				var update= {};
+				update[update_module] = forkProcess.pid;
+				var options = { new: true, projection: { _id: 0 } };
 
-		CronModel.findOneAndUpdate({}, update, options, function(err, doc){  
-			return (err) ? false : true;
-		});
+				CronModel.findOneAndUpdate({}, update, options, function(err, doc){  
+					return (err) ? false : true;
+				});
+			}
+		);
 	}
 
 //	TEMPERATURE & HUMIDITY
@@ -95,7 +98,6 @@ fork = require('child_process').fork;
 			'temp_humidity.autoMode.intervalUnitIndex': req.body.intervalUnitIndex
 		};  
 		var options = { new: true, projection: { _id: 0 } };
-		var args = req.body.args;
 		
 		ControlsModel.findOneAndUpdate({}, update, options, function(err, doc){  
 			if (err)
@@ -106,7 +108,7 @@ fork = require('child_process').fork;
 					req.body.args.intervalUnitIndex
 				];
 				
-				doc.cron = createCron('temp_humidity.autoMode.process',
+				doc.cron = processCron('temp_humidity.autoMode.process',
 					'./crons/cron_tempHumidity.js',
 					args
 				);
@@ -156,13 +158,14 @@ fork = require('child_process').fork;
 				res.send(err);
 			else{
 				var args = [
-					req.body.args.interval,
-					req.body.args.intervalUnitIndex,
+					'autoMode',
 					req.body.args.runFor,
-					req.body.args.runForUnitIndex
+					req.body.args.runForUnitIndex,
+					req.body.args.interval,
+					req.body.args.intervalUnitIndex
 				];
 				
-				doc.cron = createCron('foggers.autoMode.process',
+				doc.cron = processCron('foggers.autoMode.process',
 					'./crons/cron_foggers.js',
 					args
 				);
@@ -194,8 +197,20 @@ fork = require('child_process').fork;
 		ControlsModel.findOneAndUpdate({}, update, options, function(err, doc){  
 			if (err)
 				res.send(err);
-			else
+			else{
+				var args = [
+					'manualMode',
+					req.body.args.runFor,
+					req.body.args.runForUnitIndex
+				];
+				
+				doc.cron = processCron('foggers.manualMode.process',
+					'./crons/cron_foggers.js',
+					args
+				);
+				
 				res.json({controls: doc});
+			}
 		});
 	}
 	
