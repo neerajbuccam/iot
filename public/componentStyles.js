@@ -94,3 +94,10 @@ export const snackbarBodyStyle = {
     height: '40px',
     lineHeight: '40px'
 };
+
+export const refreshIconStyle = {
+	display: 'inline-block',
+    float: 'right',
+    marginRight: '15px',
+    marginLeft: '-30px'
+};

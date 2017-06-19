@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
 import {Router} from 'react-router'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
@@ -21,7 +22,8 @@ import {circleStyle,
 		itemSubheaderStyle,
 		subheaderStyle,
 		snackbarStyle,
-		snackbarBodyStyle} from '../public/componentStyles'
+		snackbarBodyStyle,
+		refreshIconStyle} from '../public/componentStyles'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import Paper from 'material-ui/Paper'
 import Subheader from 'material-ui/Subheader'
@@ -46,6 +48,8 @@ class Sprinklers extends React.Component{
 		this.toggleManualMode = this.toggleManualMode.bind(this);
 		this.startManualMode = this.startManualMode.bind(this);
 		this.setSnackbarOff = this.setSnackbarOff.bind(this);
+		this.refreshState = this.refreshState.bind(this);
+		this.refreshNode = null;
 		
 		this.state = {
 			snackbar: {
@@ -104,6 +108,9 @@ class Sprinklers extends React.Component{
 		if(updateFlag == true){
 			let sprinklers = Object.assign({}, this.state, update);
 			this.setState({ sprinklers });
+			
+			if (this.refreshNode)
+				this.refreshNode.classList.remove('fa-spin');
 		}
 	}
 	
@@ -153,6 +160,12 @@ class Sprinklers extends React.Component{
 		this.props.sprinklersActions.startManualMode(runFor, runForUnitIndex);
 	}
 	
+	refreshState(){
+		this.refreshNode = ReactDOM.findDOMNode(this.refs.refresh);
+		this.refreshNode.classList.add('fa-spin');
+		this.props.controlsActions.getControls();
+	}
+	
 	render(){
 		const { controls } = this.props;
 		
@@ -162,6 +175,9 @@ class Sprinklers extends React.Component{
 					<MuiThemeProvider>
 						<Subheader style={headerStyle}>
 							<i className="fa fa-superpowers fa-fw fa-1_5x" aria-hidden="true"></i> Sprinklers
+							<div style={refreshIconStyle}>
+								<i onClick={this.refreshState} ref="refresh" className="fa fa-refresh fa-fw fa-1_5x" aria-hidden="true"></i>
+							</div>
 						</Subheader>
 					</MuiThemeProvider>
 					<br/>

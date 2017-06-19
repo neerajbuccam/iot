@@ -4483,6 +4483,13 @@ var snackbarBodyStyle = exports.snackbarBodyStyle = {
 	lineHeight: '40px'
 };
 
+var refreshIconStyle = exports.refreshIconStyle = {
+	display: 'inline-block',
+	float: 'right',
+	marginRight: '15px',
+	marginLeft: '-30px'
+};
+
 /***/ }),
 /* 62 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -21739,6 +21746,10 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _reactDom = __webpack_require__(18);
+
+var _reactDom2 = _interopRequireDefault(_reactDom);
+
 var _reactRouter = __webpack_require__(36);
 
 var _redux = __webpack_require__(58);
@@ -21827,6 +21838,8 @@ var Extras = function (_React$Component) {
 
 		_this.toggleModule = _this.toggleModule.bind(_this);
 		_this.setSnackbarOff = _this.setSnackbarOff.bind(_this);
+		_this.refreshState = _this.refreshState.bind(_this);
+		_this.refreshNode = null;
 
 		_this.state = {
 			snackbar: {
@@ -21880,6 +21893,8 @@ var Extras = function (_React$Component) {
 			if (updateFlag == true) {
 				var controls = Object.assign({}, this.state.controls, update);
 				this.setState({ controls: controls });
+
+				if (this.refreshNode) this.refreshNode.classList.remove('fa-spin');
 			}
 		}
 	}, {
@@ -21898,6 +21913,13 @@ var Extras = function (_React$Component) {
 			if (module == 'lights_1') var status = this.state.controls.lights_1.status;else if (module == 'lights_2') var status = this.state.controls.lights_2.status;else if (module == 'water_pump') var status = this.state.controls.water_pump.status;
 			console.log(status);
 			this.props.ExtrasActions.toggleModule(module, status);
+		}
+	}, {
+		key: 'refreshState',
+		value: function refreshState() {
+			this.refreshNode = _reactDom2.default.findDOMNode(this.refs.refresh);
+			this.refreshNode.classList.add('fa-spin');
+			this.props.controlsActions.getControls();
 		}
 	}, {
 		key: 'render',
@@ -21920,7 +21942,12 @@ var Extras = function (_React$Component) {
 							_Subheader2.default,
 							{ style: _componentStyles.headerStyle },
 							_react2.default.createElement('i', { className: 'fa fa-cubes fa-fw fa-1_5x', 'aria-hidden': 'true' }),
-							' Extras'
+							' Extras',
+							_react2.default.createElement(
+								'div',
+								{ style: _componentStyles.refreshIconStyle },
+								_react2.default.createElement('i', { onClick: this.refreshState, ref: 'refresh', className: 'fa fa-refresh fa-fw fa-1_5x', 'aria-hidden': 'true' })
+							)
 						)
 					),
 					_react2.default.createElement('br', null),
@@ -22097,6 +22124,10 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _reactDom = __webpack_require__(18);
+
+var _reactDom2 = _interopRequireDefault(_reactDom);
+
 var _reactRouter = __webpack_require__(36);
 
 var _redux = __webpack_require__(58);
@@ -22189,6 +22220,8 @@ var Foggers = function (_React$Component) {
 		_this.toggleManualMode = _this.toggleManualMode.bind(_this);
 		_this.startManualMode = _this.startManualMode.bind(_this);
 		_this.setSnackbarOff = _this.setSnackbarOff.bind(_this);
+		_this.refreshState = _this.refreshState.bind(_this);
+		_this.refreshNode = null;
 
 		_this.state = {
 			snackbar: {
@@ -22251,6 +22284,8 @@ var Foggers = function (_React$Component) {
 			if (updateFlag == true) {
 				var foggers = Object.assign({}, this.state, update);
 				this.setState({ foggers: foggers });
+
+				if (this.refreshNode) this.refreshNode.classList.remove('fa-spin');
 			}
 		}
 	}, {
@@ -22306,6 +22341,13 @@ var Foggers = function (_React$Component) {
 			this.props.foggersActions.startManualMode(runFor, runForUnitIndex);
 		}
 	}, {
+		key: 'refreshState',
+		value: function refreshState() {
+			this.refreshNode = _reactDom2.default.findDOMNode(this.refs.refresh);
+			this.refreshNode.classList.add('fa-spin');
+			this.props.controlsActions.getControls();
+		}
+	}, {
 		key: 'render',
 		value: function render() {
 			var _this2 = this;
@@ -22326,7 +22368,12 @@ var Foggers = function (_React$Component) {
 							_Subheader2.default,
 							{ style: _componentStyles.headerStyle },
 							_react2.default.createElement('i', { className: 'fa fa-shower fa-fw fa-1_5x', 'aria-hidden': 'true' }),
-							' Foggers'
+							' Foggers',
+							_react2.default.createElement(
+								'div',
+								{ style: _componentStyles.refreshIconStyle },
+								_react2.default.createElement('i', { onClick: this.refreshState, ref: 'refresh', className: 'fa fa-refresh fa-fw fa-1_5x', 'aria-hidden': 'true' })
+							)
 						)
 					),
 					_react2.default.createElement('br', null),
@@ -22467,6 +22514,10 @@ var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _reactDom = __webpack_require__(18);
+
+var _reactDom2 = _interopRequireDefault(_reactDom);
+
 var _reactRouter = __webpack_require__(36);
 
 var _redux = __webpack_require__(58);
@@ -22559,6 +22610,8 @@ var Sprinklers = function (_React$Component) {
 		_this.toggleManualMode = _this.toggleManualMode.bind(_this);
 		_this.startManualMode = _this.startManualMode.bind(_this);
 		_this.setSnackbarOff = _this.setSnackbarOff.bind(_this);
+		_this.refreshState = _this.refreshState.bind(_this);
+		_this.refreshNode = null;
 
 		_this.state = {
 			snackbar: {
@@ -22621,6 +22674,8 @@ var Sprinklers = function (_React$Component) {
 			if (updateFlag == true) {
 				var sprinklers = Object.assign({}, this.state, update);
 				this.setState({ sprinklers: sprinklers });
+
+				if (this.refreshNode) this.refreshNode.classList.remove('fa-spin');
 			}
 		}
 	}, {
@@ -22676,6 +22731,13 @@ var Sprinklers = function (_React$Component) {
 			this.props.sprinklersActions.startManualMode(runFor, runForUnitIndex);
 		}
 	}, {
+		key: 'refreshState',
+		value: function refreshState() {
+			this.refreshNode = _reactDom2.default.findDOMNode(this.refs.refresh);
+			this.refreshNode.classList.add('fa-spin');
+			this.props.controlsActions.getControls();
+		}
+	}, {
 		key: 'render',
 		value: function render() {
 			var _this2 = this;
@@ -22696,7 +22758,12 @@ var Sprinklers = function (_React$Component) {
 							_Subheader2.default,
 							{ style: _componentStyles.headerStyle },
 							_react2.default.createElement('i', { className: 'fa fa-superpowers fa-fw fa-1_5x', 'aria-hidden': 'true' }),
-							' Sprinklers'
+							' Sprinklers',
+							_react2.default.createElement(
+								'div',
+								{ style: _componentStyles.refreshIconStyle },
+								_react2.default.createElement('i', { onClick: this.refreshState, ref: 'refresh', className: 'fa fa-refresh fa-fw fa-1_5x', 'aria-hidden': 'true' })
+							)
 						)
 					),
 					_react2.default.createElement('br', null),
@@ -24550,7 +24617,7 @@ module.exports = {
 	pins: {
 		water_pump: 0,
 		temp_humidity: 11,
-		foggerSide1: 29,
+		foggerSide1: 16,
 		foggerSide2: 18,
 		sprinklerSide1: 13,
 		sprinklerSide2: 15,

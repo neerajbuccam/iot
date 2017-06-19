@@ -29,6 +29,9 @@ var SIGTERM = false;
 var dbQuery = module + 's.' + mode + '.status';
 var key1status = module + 's.' + module + 'Side1.status';
 var key2status = module + 's.' + module + 'Side2.status';
+var water_pump_status = 'water_pump.status';
+
+var water_pump = global.pins.water_pump;
 
 if (module == 'fogger') {
 	var side1 = global.pins.foggerSide1;
@@ -41,35 +44,38 @@ else if (module == 'sprinkler') {
 
 var half_runFor_In_mSeconds = parseInt(runFor_In_mSeconds / 2);
 	
-function toggleModule(side, data){
+function toggleModule(module, data){
 	var update = {};
-	side == 'side1' ? update[key1status] = data : null;
-	side == 'side2' ? update[key2status] = data : null;
+	module == 'side1' ? update[key1status] = data : null;
+	module == 'side2' ? update[key2status] = data : null;
+	module == 'water_pump' ? update[water_pump_status] = data : null;
 
 	var options = { new: true, projection: { _id: 0 } };
 	ControlsModel.findOneAndUpdate({}, update, options, function(){});
 }
 
-function togglePin(pin, side, data){
+function togglePin(pin, module, data){
 	gpio.write(pin, data, function(err) {
 		if (err)
 			console.log('error: ' + err);
 		
 		if (!SIGTERM)
-			toggleModule(side, data);
+			toggleModule(module, data);
 		console.log(module + ' ' + pin + ' is ' + (data ? 'ON' : 'OFF'));
 	});
 }
 
 function terminateScript(){
-	SIGTERM = true;
+	togglePin(water_pump, 'water_pump', false);
 	togglePin(side1, 'side1', false);
 	togglePin(side2, 'side2', false);
+	SIGTERM = true;
 	exec('kill', [process.pid]);
 }
 
 process.on('SIGTERM', function() {
 	var update = {};
+	update[water_pump_status] = false;
 	update[key1status] = false;
 	update[key2status] = false;
 	ControlsModel.findOneAndUpdate({}, update, function(err){
@@ -97,30 +103,34 @@ function start(){
 		function (err, status) {
 			modeStatus = status[0];
 			
-			gpio.setup(side1, gpio.DIR_OUT, function(){
-				gpio.setup(side2, gpio.DIR_OUT, function(){
-					if (modeStatus) {
-						togglePin(side1, 'side1', false);
-						togglePin(side2, 'side2', false);
-						
-						togglePin(side1, 'side1', true);
-						
-						setTimeout(function(){
+			gpio.setup(water_pump, gpio.DIR_OUT, function(){
+				gpio.setup(side1, gpio.DIR_OUT, function(){
+					gpio.setup(side2, gpio.DIR_OUT, function(){
+						if (modeStatus) {
 							togglePin(side1, 'side1', false);
-							togglePin(side2, 'side2', true);
-						}, half_runFor_In_mSeconds);
-						
-						setTimeout(function(){
 							togglePin(side2, 'side2', false);
 							
-							if (mode == 'manualMode')
-								terminateScript();
-						}, runFor_In_mSeconds);
-						
-					}
-					else {
-						terminateScript();
-					}
+							togglePin(side1, 'side1', true);
+							togglePin(water_pump, 'water_pump', true);
+							
+							setTimeout(function(){
+								togglePin(side1, 'side1', false);
+								togglePin(side2, 'side2', true);
+							}, half_runFor_In_mSeconds);
+							
+							setTimeout(function(){
+								togglePin(water_pump, 'water_pump', false);
+								togglePin(side2, 'side2', false);
+								
+								if (mode == 'manualMode')
+									terminateScript();
+							}, runFor_In_mSeconds);
+							
+						}
+						else {
+							terminateScript();
+						}
+					});
 				});
 			});
 			

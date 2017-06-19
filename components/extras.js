@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
 import {Router} from 'react-router'
 import {bindActionCreators} from 'redux'
 import {connect} from 'react-redux'
@@ -14,7 +15,8 @@ import {toggleStyle,
 		headerStyle,
 		moduleheaderStyle,
 		snackbarStyle,
-		snackbarBodyStyle} from '../public/componentStyles'
+		snackbarBodyStyle,
+		refreshIconStyle} from '../public/componentStyles'
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import Paper from 'material-ui/Paper'
 import Subheader from 'material-ui/Subheader'
@@ -35,6 +37,8 @@ class Extras extends React.Component{
 		
 		this.toggleModule = this.toggleModule.bind(this);
 		this.setSnackbarOff = this.setSnackbarOff.bind(this);
+		this.refreshState = this.refreshState.bind(this);
+		this.refreshNode = null;
 		
 		this.state = {
 			snackbar: {
@@ -84,6 +88,9 @@ class Extras extends React.Component{
 		if(updateFlag == true){
 			let controls = Object.assign({}, this.state.controls, update);
 			this.setState({ controls });
+			
+			if (this.refreshNode)
+				this.refreshNode.classList.remove('fa-spin');
 		}
 	}
 	
@@ -107,6 +114,12 @@ class Extras extends React.Component{
 		this.props.ExtrasActions.toggleModule(module, status);
 	}
 	
+	refreshState(){
+		this.refreshNode = ReactDOM.findDOMNode(this.refs.refresh);
+		this.refreshNode.classList.add('fa-spin');
+		this.props.controlsActions.getControls();
+	}
+	
 	render(){
 		const { controls } = this.props;
 		
@@ -116,6 +129,9 @@ class Extras extends React.Component{
 					<MuiThemeProvider>
 						<Subheader style={headerStyle}>
 							<i className="fa fa-cubes fa-fw fa-1_5x" aria-hidden="true"></i> Extras
+							<div style={refreshIconStyle}>
+								<i onClick={this.refreshState} ref="refresh" className="fa fa-refresh fa-fw fa-1_5x" aria-hidden="true"></i>
+							</div>
 						</Subheader>
 					</MuiThemeProvider>
 					<br/>
