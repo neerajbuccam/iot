@@ -50,25 +50,21 @@ function toggleModule(side, data){
 	ControlsModel.findOneAndUpdate({}, update, options, function(){});
 }
 
-function togglePin(pin, side, direction, data){
-/*	var d = (direction == 'in') ? gpio.DIR_IN : gpio.DIR_OUT;
-	gpio.setup(pin, d, function(){
-		gpio.write(pin, data, function(err) {
-			if (err)
-				console.log('error: ' + err);
-			
-*/			if (!SIGTERM)
-				toggleModule(side, data);
-			console.log(module + ' ' + pin + ' is ' + (data ? 'ON' : 'OFF'));
-/*		});
+function togglePin(pin, side, data){
+	gpio.write(pin, data, function(err) {
+		if (err)
+			console.log('error: ' + err);
+		
+		if (!SIGTERM)
+			toggleModule(side, data);
+		console.log(module + ' ' + pin + ' is ' + (data ? 'ON' : 'OFF'));
 	});
-*/
 }
 
 function terminateScript(){
 	SIGTERM = true;
-	togglePin(side1, 'side1', 'in', false);
-	togglePin(side2, 'side2', 'in', false);
+	togglePin(side1, 'side1', false);
+	togglePin(side2, 'side2', false);
 	exec('kill', [process.pid]);
 }
 
@@ -100,27 +96,34 @@ function start(){
 	ControlsModel.distinct(dbQuery).exec(
 		function (err, status) {
 			modeStatus = status[0];
-			if (modeStatus) {
-				togglePin(side1, 'side1', 'in', false);
-				togglePin(side2, 'side2', 'in', false);
-				togglePin(side1, 'side1', 'in', true);
-				
-				setTimeout(function(){
-					togglePin(side1, 'side1', 'in', false);
-					togglePin(side2, 'side2', 'in', true);
-				}, half_runFor_In_mSeconds);
-				
-				setTimeout(function(){
-					togglePin(side2, 'side2', 'in', false);
-					
-					if (mode == 'manualMode')
+			
+			gpio.setup(side1, gpio.DIR_OUT, function(){
+				gpio.setup(side2, gpio.DIR_OUT, function(){
+					if (modeStatus) {
+						togglePin(side1, 'side1', false);
+						togglePin(side2, 'side2', false);
+						
+						togglePin(side1, 'side1', true);
+						
+						setTimeout(function(){
+							togglePin(side1, 'side1', false);
+							togglePin(side2, 'side2', true);
+						}, half_runFor_In_mSeconds);
+						
+						setTimeout(function(){
+							togglePin(side2, 'side2', false);
+							
+							if (mode == 'manualMode')
+								terminateScript();
+						}, runFor_In_mSeconds);
+						
+					}
+					else {
 						terminateScript();
-				}, runFor_In_mSeconds);
-				
-			}
-			else {
-				terminateScript();
-			}
+					}
+				});
+			});
+			
 		}
 	);
 }

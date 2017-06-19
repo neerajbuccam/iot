@@ -4,8 +4,23 @@ var ControlsModel = require('./models/controls');
 var TempHumidityModel = require('./models/tempHumidity');
 var CronModel = require('./models/cron');
 
+var global = require('./global_config')
+var gpio = require("rpi-gpio")
 exec = require('child_process').execFile;
 fork = require('child_process').fork;
+
+//	SWITCH
+
+	function togglePin(module, data){
+		var pin = global.pins[module];
+		gpio.setup(pin, gpio.DIR_OUT, function(){
+			gpio.write(pin, data, function(err) {
+				if (err)
+					console.log('error: ' + err);
+				console.log(module + ' is ' + (data ? 'ON' : 'OFF'));
+			});
+		});
+	}
 	
 //	CRON
 	
@@ -324,14 +339,16 @@ fork = require('child_process').fork;
 		var update  = {};
 		var module = req.body.module;
 		
-		update[module + '.status'] = req.body.status; 
-		var options = { new: true, projection: { _id: 0 } }; 
+		update[module + '.status'] = req.body.status;
+		var options = { new: true, projection: { _id: 0 } };
 
 		ControlsModel.findOneAndUpdate({}, update, options, function(err, doc){
 			if (err)
 				res.send(err);
-			else
+			else{
+				togglePin(module, req.body.status);
 				res.json({controls: doc});
+			}
 		});
 	}
 	
