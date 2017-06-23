@@ -19,6 +19,12 @@ export default function tempHumidityReducer(state = initialState, action) {
 			})
 			break;
 		}
+		case 'FILTER_TEMP_HUMIDITY': {
+			return Object.assign({}, ...state.tempHumidity, {
+				tempHumidity: action.payload
+			})
+			break;
+		}
 		default:
 			return state
 	}

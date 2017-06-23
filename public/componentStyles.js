@@ -45,7 +45,7 @@ export const headerStyle = {
 };
 
 export const itemSubheaderStyle = {
-	color: 'rgba(109, 16, 102, 0.6)',
+	color: 'rgba(107, 23, 142, 0.7)',
 	fontSize: '18px',
 	fontWeight: '600',
 	lineHeight: '30px',
@@ -53,7 +53,7 @@ export const itemSubheaderStyle = {
 };
 
 export const moduleheaderStyle = {
-	color: 'rgba(109, 16, 102, 0.6)',
+	color: 'rgba(107, 23, 142, 0.7)',
 	fontSize: '18px',
 	fontWeight: '600',
 	lineHeight: '30px',
@@ -65,7 +65,7 @@ export const moduleheaderStyle = {
 };
 
 export const subheaderStyle = {
-	color: 'rgba(109, 16, 102, 0.6)',
+	color: 'rgba(107, 23, 142, 0.7)',
 	fontSize: '18px',
 	fontWeight: '600',
 	lineHeight: '30px',
@@ -100,4 +100,16 @@ export const refreshIconStyle = {
     float: 'right',
     marginRight: '15px',
     marginLeft: '-30px'
+};
+
+export const fullHeaderStyle = {
+	color: 'rgba(107, 23, 142, 0.7)',
+	fontSize: '18px',
+	fontWeight: '600',
+	lineHeight: '30px',
+	fontFamily: 'Roboto,sans-serif',
+	display: 'inline-block',
+	width: '100%',
+    textAlign: 'center',
+	padding: '0'
 };

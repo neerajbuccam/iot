@@ -6,6 +6,7 @@ var CronModel = require('./models/cron');
 
 var global = require('./global_config')
 var gpio = require("rpi-gpio")
+var moment = require('moment');
 exec = require('child_process').execFile;
 fork = require('child_process').fork;
 
@@ -80,7 +81,41 @@ fork = require('child_process').fork;
 //	TEMPERATURE & HUMIDITY
 	
 	function getTempHumidity(req, res){
-		TempHumidityModel.find({}, {_id: 0}).sort({date: -1})
+		
+		TempHumidityModel.find({}, {_id: 0, sensor: 0})
+			.sort({date: -1})
+			.limit(1)
+			.exec(
+				function (err, tempHumidity) {
+					if (err)
+						res.send(err);
+					else
+						res.json(tempHumidity);
+				}
+			);
+	}
+	
+	function filterTempHumidity(req, res){
+		var dateFrom, dateTo;
+		
+		if (req.body.date) {
+			dateFrom = moment(req.body.date);
+			dateFrom.startOf('day');
+			dateTo = dateFrom.clone().add(1, 'days');
+		}
+		else {
+			dateFrom = moment();
+			dateFrom.startOf('day');
+			dateTo = dateFrom.clone().add(1, 'days');
+		}
+		
+		TempHumidityModel.find({
+				date: {
+					$gte: dateFrom,
+					$lt:  dateTo
+				}
+			}, {_id: 0, sensor: 0})
+			.sort({date: 1})
 			.exec(
 				function (err, tempHumidity) {
 					if (err)
@@ -353,6 +388,8 @@ fork = require('child_process').fork;
 	}
 	
 //	API ROUTES
+	//	DASHBOARD
+	apiRoutes.route('/temp-humidity/filterTempHumidity').post(filterTempHumidity);
 	//	CONTROLS
 	apiRoutes.route('/controls/get_controls').get(getControls);
 	//	TEMPERATURE & HUMIDITY

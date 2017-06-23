@@ -11,6 +11,11 @@ const NavItemStyle = {
 	borderTop: '1px lightgray solid'
 };
 
+const logoTitleStyle = {
+	fontVariant: 'small-caps',
+	fontWeight: '600'
+}
+
 export default class Navbar extends React.Component{
 	constructor(props) {
 		super(props);
@@ -32,10 +37,11 @@ export default class Navbar extends React.Component{
 			<div>
 				<MuiThemeProvider>
 					<AppBar title={this.props.title}
+					 titleStyle={logoTitleStyle}
 					 onLeftIconButtonTouchTap={this.handleToggle}
 					 iconElementRight={
 						<div>
-							<Link to="/"><IconButton iconClassName="muidocs-icon-action-home" tooltip="Dashboard" /></Link>
+							<Link to="/dashboard"><IconButton iconClassName="muidocs-icon-action-home" tooltip="Dashboard" /></Link>
 							<IconMenu
 								iconButtonElement={<IconButton iconClassName="muidocs-icon-navigation-expand-more" />}
 								targetOrigin={{horizontal: 'right', vertical: 'top'}}

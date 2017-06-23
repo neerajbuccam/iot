@@ -14,6 +14,18 @@ function getTempHumidity(){
 	}
 }
 
+function filterTempHumidity(date){
+	return function(dispatch){
+		axios.post(`${API_URL}/temp-humidity/filterTempHumidity`, {date: date})
+		.then(response => {
+			dispatch({
+				type: 'FILTER_TEMP_HUMIDITY',
+				payload: response.data
+			});
+		});
+	}
+}
+
 function toggleAutoMode(status){
 	return function(dispatch){
 		axios.post(`${API_URL}/controls/tempHumidity_toggleAutoMode`, {status: !status})
@@ -50,6 +62,7 @@ function resetAutoMode(interval, intervalUnitIndex){
 
 const tempHumidityAction = {
 	getTempHumidity,
+	filterTempHumidity,
 	toggleAutoMode,
 	resetAutoMode
 };
