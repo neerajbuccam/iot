@@ -14,6 +14,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use('/api', apiController);
 
+app.get('*.js', function (req, res, next) {
+	req.url = req.url + '.gz';
+	res.set('Content-Encoding', 'gzip');
+	next();
+});
+
 app.get('*', function (req, res) {
    res.sendFile( __dirname + "/views/" + "index.html" );
 })

@@ -113,3 +113,15 @@ export const fullHeaderStyle = {
     textAlign: 'center',
 	padding: '0'
 };
+
+export const desktopModules = {
+	boxSizing: 'border-box',
+    color: '#795548',
+    fontSize: '16px',
+    fontWeight: '600',
+    paddingLeft: '10px',
+    fontFamily: 'Roboto, sans-serif',
+    display: 'inline-block',
+    lineHeight: '0px',
+    width: 'auto'
+};

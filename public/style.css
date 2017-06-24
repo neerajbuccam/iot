@@ -3,6 +3,9 @@ body{
 	padding:0;
 }
 
+.show { display: block; }
+.hide { display: none; }
+
 a{ text-decoration: none; }
 
 .drawer-title{
@@ -40,9 +43,30 @@ a{ text-decoration: none; }
 
 .fa-1_5x{ font-size: 1.5em; }
 
+.dashboardModuleIcon{
+	color: #038090;
+}
+
  .width50{
 	width: 50%;
 	display: inline-block;
+}
+
+.moduleStatusLight{
+	width: 18px;
+	height: 18px;
+	display: inline-block;
+	border-radius: 50%;
+	float: right;
+    margin: 3px 5px 0 0;
+}
+.moduleStatusLightON{
+	background-color: rgba(8, 220, 15, 0.6);
+	border: 3px solid darkgreen;
+}
+.moduleStatusLightOFF{
+	background-color: rgba(218, 39, 39, 0.6);
+	border: 3px solid darkred;
 }
 
 .footerStyle{

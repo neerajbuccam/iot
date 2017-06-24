@@ -8699,6 +8699,18 @@ var fullHeaderStyle = exports.fullHeaderStyle = {
 	padding: '0'
 };
 
+var desktopModules = exports.desktopModules = {
+	boxSizing: 'border-box',
+	color: '#795548',
+	fontSize: '16px',
+	fontWeight: '600',
+	paddingLeft: '10px',
+	fontFamily: 'Roboto, sans-serif',
+	display: 'inline-block',
+	lineHeight: '0px',
+	width: 'auto'
+};
+
 /***/ }),
 /* 54 */
 /***/ (function(module, exports, __webpack_require__) {
@@ -37318,6 +37330,10 @@ var _react = __webpack_require__(2);
 
 var _react2 = _interopRequireDefault(_react);
 
+var _reactDom = __webpack_require__(17);
+
+var _reactDom2 = _interopRequireDefault(_reactDom);
+
 var _reactRouter = __webpack_require__(33);
 
 var _redux = __webpack_require__(51);
@@ -37381,6 +37397,14 @@ var chartStyle = {
 	height: '300px'
 };
 
+var moduleCard = {
+	width: '47%',
+	display: 'inline-block',
+	margin: '5px'
+};
+
+var cardTextStyle = { padding: '5px' };
+
 var tempSeriesData = {};
 
 var Dashboard = function (_React$Component) {
@@ -37392,6 +37416,9 @@ var Dashboard = function (_React$Component) {
 		var _this = _possibleConstructorReturn(this, (Dashboard.__proto__ || Object.getPrototypeOf(Dashboard)).call(this, props));
 
 		_this.initChart = _this.initChart.bind(_this);
+		_this.refreshState = _this.refreshState.bind(_this);
+		_this.refreshNode = null;
+		_this.chartBoxNode = null;
 
 		_this.state = {
 			tempHumidity: [],
@@ -37408,10 +37435,17 @@ var Dashboard = function (_React$Component) {
 			this.justLoaded = true;
 		}
 	}, {
+		key: 'componentDidMount',
+		value: function componentDidMount() {
+			this.chartBoxNode = _reactDom2.default.findDOMNode(this.refs.chartBox);
+			this.chartBoxNode.classList.add('hide');
+		}
+	}, {
 		key: 'componentWillReceiveProps',
 		value: function componentWillReceiveProps(newProps) {
 			var oldControls = this.props;
 			var newControls = newProps;
+			var updateFlag = false;
 			var update = {};
 
 			if (JSON.stringify(oldControls.controls) != JSON.stringify(newControls.controls)) {
@@ -37419,6 +37453,7 @@ var Dashboard = function (_React$Component) {
 
 				var controls = Object.assign({}, this.state.controls, update);
 				this.setState({ controls: controls });
+				updateFlag = true;
 			}
 
 			if (Object.keys(this.state.tempHumidity).length == 0 || JSON.stringify(oldControls.tempHumidity) != JSON.stringify(newControls.tempHumidity)) {
@@ -37426,6 +37461,11 @@ var Dashboard = function (_React$Component) {
 
 				var tempHumidity = Object.assign({}, this.state.tempHumidity, update);
 				this.setState({ tempHumidity: tempHumidity });
+				updateFlag = true;
+			}
+
+			if (updateFlag == true) {
+				if (this.refreshNode) this.refreshNode.classList.remove('fa-spin');
 			}
 		}
 	}, {
@@ -37449,18 +37489,31 @@ var Dashboard = function (_React$Component) {
 					tempSeriesData.temperature.push(tempData);
 					tempSeriesData.humidity.push(humidData);
 
-					if (Object.keys(tempHumidity).length == index + 1) {
+					if (Object.keys(tempSeriesData.temperature).length >= 2 && Object.keys(tempHumidity).length == index + 1) {
 						_this2.initChart();
 					}
+					console.log(Object.keys(tempSeriesData.temperature).length);
 				});
-				console.log(tempSeriesData);
 			}
+		}
+	}, {
+		key: 'refreshState',
+		value: function refreshState() {
+			this.refreshNode = _reactDom2.default.findDOMNode(this.refs.refresh);
+			this.refreshNode.classList.add('fa-spin');
+			this.props.controlsActions.getControls();
 		}
 	}, {
 		key: 'initChart',
 		value: function initChart() {
+			this.chartBoxNode.classList.remove('hide');
+			this.chartBoxNode.classList.add('show');
+
 			var chart = _highcharts2.default.chart('chart', {
 				chart: { type: 'spline' },
+				credits: {
+					enabled: false
+				},
 				title: {
 					text: 'Temperature & Humidity Report',
 					style: {
@@ -37512,6 +37565,9 @@ var Dashboard = function (_React$Component) {
 	}, {
 		key: 'render',
 		value: function render() {
+			var controls = this.props.controls;
+
+
 			return _react2.default.createElement(
 				_app2.default,
 				{ router: _reactRouter.Router },
@@ -37522,19 +37578,201 @@ var Dashboard = function (_React$Component) {
 						'div',
 						{ className: 'pad-hoz-15' },
 						_react2.default.createElement(
+							'div',
+							{ ref: 'chartBox' },
+							_react2.default.createElement(
+								_MuiThemeProvider2.default,
+								null,
+								_react2.default.createElement(
+									_Card.Card,
+									null,
+									_react2.default.createElement(
+										_Card.CardText,
+										null,
+										_react2.default.createElement(
+											'div',
+											null,
+											_react2.default.createElement('div', { id: 'chart', style: chartStyle })
+										)
+									)
+								)
+							)
+						),
+						_react2.default.createElement('br', null),
+						_react2.default.createElement(
+							_MuiThemeProvider2.default,
+							null,
+							_react2.default.createElement(
+								_Subheader2.default,
+								{ style: _componentStyles.headerStyle },
+								_react2.default.createElement('i', { className: 'fa fa-cogs fa-fw fa-1_5x', 'aria-hidden': 'true' }),
+								' Modules Status',
+								_react2.default.createElement(
+									'div',
+									{ style: _componentStyles.refreshIconStyle },
+									_react2.default.createElement('i', { onClick: this.refreshState, ref: 'refresh', className: 'fa fa-refresh fa-fw fa-1_5x', 'aria-hidden': 'true' })
+								)
+							)
+						),
+						_react2.default.createElement('br', null),
+						_react2.default.createElement(
 							_MuiThemeProvider2.default,
 							null,
 							_react2.default.createElement(
 								_Card.Card,
-								null,
+								{ style: moduleCard },
 								_react2.default.createElement(
 									_Card.CardText,
-									null,
+									{ style: cardTextStyle },
 									_react2.default.createElement(
-										'div',
+										_MuiThemeProvider2.default,
 										null,
-										_react2.default.createElement('div', { id: 'chart', style: chartStyle })
-									)
+										_react2.default.createElement(
+											_Subheader2.default,
+											{ style: _componentStyles.desktopModules },
+											_react2.default.createElement('i', { className: 'fa fa-shower fa-fw fa-1_5x dashboardModuleIcon', 'aria-hidden': 'true' }),
+											' Fogger 1'
+										)
+									),
+									_react2.default.createElement('div', { className: controls.foggers.foggerSide1.status ? 'moduleStatusLight moduleStatusLightON' : 'moduleStatusLight moduleStatusLightOFF' })
+								)
+							)
+						),
+						_react2.default.createElement(
+							_MuiThemeProvider2.default,
+							null,
+							_react2.default.createElement(
+								_Card.Card,
+								{ style: moduleCard },
+								_react2.default.createElement(
+									_Card.CardText,
+									{ style: cardTextStyle },
+									_react2.default.createElement(
+										_MuiThemeProvider2.default,
+										null,
+										_react2.default.createElement(
+											_Subheader2.default,
+											{ style: _componentStyles.desktopModules },
+											_react2.default.createElement('i', { className: 'fa fa-shower fa-fw fa-1_5x dashboardModuleIcon', 'aria-hidden': 'true' }),
+											' Fogger 2'
+										)
+									),
+									_react2.default.createElement('div', { className: controls.foggers.foggerSide2.status ? 'moduleStatusLight moduleStatusLightON' : 'moduleStatusLight moduleStatusLightOFF' })
+								)
+							)
+						),
+						_react2.default.createElement(
+							_MuiThemeProvider2.default,
+							null,
+							_react2.default.createElement(
+								_Card.Card,
+								{ style: moduleCard },
+								_react2.default.createElement(
+									_Card.CardText,
+									{ style: cardTextStyle },
+									_react2.default.createElement(
+										_MuiThemeProvider2.default,
+										null,
+										_react2.default.createElement(
+											_Subheader2.default,
+											{ style: _componentStyles.desktopModules },
+											_react2.default.createElement('i', { className: 'fa fa-superpowers fa-fw fa-1_5x dashboardModuleIcon', 'aria-hidden': 'true' }),
+											' Sprinkler 1'
+										)
+									),
+									_react2.default.createElement('div', { className: controls.sprinklers.sprinklerSide1.status ? 'moduleStatusLight moduleStatusLightON' : 'moduleStatusLight moduleStatusLightOFF' })
+								)
+							)
+						),
+						_react2.default.createElement(
+							_MuiThemeProvider2.default,
+							null,
+							_react2.default.createElement(
+								_Card.Card,
+								{ style: moduleCard },
+								_react2.default.createElement(
+									_Card.CardText,
+									{ style: cardTextStyle },
+									_react2.default.createElement(
+										_MuiThemeProvider2.default,
+										null,
+										_react2.default.createElement(
+											_Subheader2.default,
+											{ style: _componentStyles.desktopModules },
+											_react2.default.createElement('i', { className: 'fa fa-superpowers fa-fw fa-1_5x dashboardModuleIcon', 'aria-hidden': 'true' }),
+											' Sprinkler 2'
+										)
+									),
+									_react2.default.createElement('div', { className: controls.sprinklers.sprinklerSide2.status ? 'moduleStatusLight moduleStatusLightON' : 'moduleStatusLight moduleStatusLightOFF' })
+								)
+							)
+						),
+						_react2.default.createElement(
+							_MuiThemeProvider2.default,
+							null,
+							_react2.default.createElement(
+								_Card.Card,
+								{ style: moduleCard },
+								_react2.default.createElement(
+									_Card.CardText,
+									{ style: cardTextStyle },
+									_react2.default.createElement(
+										_MuiThemeProvider2.default,
+										null,
+										_react2.default.createElement(
+											_Subheader2.default,
+											{ style: _componentStyles.desktopModules },
+											_react2.default.createElement('i', { className: 'fa fa-lightbulb-o fa-fw fa-1_5x dashboardModuleIcon', 'aria-hidden': 'true' }),
+											' Lights 1'
+										)
+									),
+									_react2.default.createElement('div', { className: controls.lights_1.status ? 'moduleStatusLight moduleStatusLightON' : 'moduleStatusLight moduleStatusLightOFF' })
+								)
+							)
+						),
+						_react2.default.createElement(
+							_MuiThemeProvider2.default,
+							null,
+							_react2.default.createElement(
+								_Card.Card,
+								{ style: moduleCard },
+								_react2.default.createElement(
+									_Card.CardText,
+									{ style: cardTextStyle },
+									_react2.default.createElement(
+										_MuiThemeProvider2.default,
+										null,
+										_react2.default.createElement(
+											_Subheader2.default,
+											{ style: _componentStyles.desktopModules },
+											_react2.default.createElement('i', { className: 'fa fa-lightbulb-o fa-fw fa-1_5x dashboardModuleIcon', 'aria-hidden': 'true' }),
+											' Lights 2'
+										)
+									),
+									_react2.default.createElement('div', { className: controls.lights_2.status ? 'moduleStatusLight moduleStatusLightON' : 'moduleStatusLight moduleStatusLightOFF' })
+								)
+							)
+						),
+						_react2.default.createElement(
+							_MuiThemeProvider2.default,
+							null,
+							_react2.default.createElement(
+								_Card.Card,
+								{ style: moduleCard },
+								_react2.default.createElement(
+									_Card.CardText,
+									{ style: cardTextStyle },
+									_react2.default.createElement(
+										_MuiThemeProvider2.default,
+										null,
+										_react2.default.createElement(
+											_Subheader2.default,
+											{ style: _componentStyles.desktopModules },
+											_react2.default.createElement('i', { className: 'fa fa-tint fa-fw fa-1_5x dashboardModuleIcon', 'aria-hidden': 'true' }),
+											' Water Pump'
+										)
+									),
+									_react2.default.createElement('div', { className: controls.water_pump.status ? 'moduleStatusLight moduleStatusLightON' : 'moduleStatusLight moduleStatusLightOFF' })
 								)
 							)
 						)
