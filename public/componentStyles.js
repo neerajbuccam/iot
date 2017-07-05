@@ -119,7 +119,7 @@ export const desktopModules = {
     color: '#795548',
     fontSize: '16px',
     fontWeight: '600',
-    paddingLeft: '10px',
+    padding: '5px 0 0 5px',
     fontFamily: 'Roboto, sans-serif',
     display: 'inline-block',
     lineHeight: '0px',

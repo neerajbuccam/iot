@@ -6,7 +6,6 @@ import {connect} from 'react-redux'
 import store from '../store/store'
 import tempHumidityActions from '../actions/tempHumidity.action'
 import controlsActions from '../actions/controls.action'
-//import _ from 'lodash'
 import App from './app'
 import AutoMode from './subComponents/autoMode'
 

@@ -1,0 +1,15 @@
+#!/bin/sh
+
+cd /home/pi/sensor/log
+
+WAN_IP="$(wget -qO- http://jiofi.local.html/st_wan.w.xml | grep -oP '(?<=<wan_ip>).*(?=</wan_ip>)')"
+OLD_WAN_IP="$(cat ./WAN_IP)"
+
+if [ -n $WAN_IP -a $WAN_IP != $OLD_WAN_IP ]
+then
+	msg="$(printf 'IP Address:  %s \r\n\r\nServer running at:  http://%s:3000\r\n' $WAN_IP $WAN_IP)"
+	echo $msg | mailx -s "PolyOrchids IP Address" neerajhonda007@gmail.com
+	echo $WAN_IP > ./WAN_IP
+	sleep 10
+	echo $msg | mailx -s "PolyOrchids IP Address Backup mail" neerajhonda007@gmail.com
+fi

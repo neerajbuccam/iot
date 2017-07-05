@@ -20,6 +20,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import Subheader from 'material-ui/Subheader'
 import SelectField from 'material-ui/SelectField'
 import MenuItem from 'material-ui/MenuItem'
+import DatePicker from 'material-ui/DatePicker'
 import {Card,
 		CardHeader,
 		CardText} from 'material-ui/Card'
@@ -35,6 +36,10 @@ const moduleCard = {
     margin: '5px'
 };
 
+const dateFilterStyle = {
+	width: '7em'
+};
+
 const cardTextStyle = { padding: '5px' };
 
 let tempSeriesData = {};
@@ -45,17 +50,19 @@ class Dashboard extends React.Component {
 		
 		this.initChart = this.initChart.bind(this);
 		this.refreshState = this.refreshState.bind(this);
+		this.dateFilterChange = this.dateFilterChange.bind(this);
 		this.refreshNode = null;
 		this.chartBoxNode = null;
 		
 		this.state = {
 			tempHumidity: [],
-			controls: {}
+			controls: {},
+			dateFilter: new Date()
 		}
 	}
 	
 	componentWillMount() {
-		this.props.tempHumidityActions.filterTempHumidity(new Date());
+		this.props.tempHumidityActions.filterTempHumidity(this.state.dateFilter);
 		this.props.controlsActions.getControls();
 		this.justLoaded = true;
 	}
@@ -84,20 +91,24 @@ class Dashboard extends React.Component {
 			
 			let tempHumidity = Object.assign({}, this.state.tempHumidity, update);
 			this.setState({ tempHumidity });
+			
+			if(newControls.tempHumidity[0].date != '') {
+				this.setState({
+				  dateFilter: new Date(newControls.tempHumidity[0].date)
+				});
+			}
 			updateFlag = true;
 		}
 		
-		if(updateFlag == true){
-			if (this.refreshNode)
-				this.refreshNode.classList.remove('fa-spin');
-		}
+		if(this.refreshNode)
+			this.refreshNode.classList.remove('fa-spin');
 	}
 	
 	componentDidUpdate(prevProps, prevState){
 		if (prevProps.tempHumidity.length > 1) {
 			tempSeriesData.temperature = [];
 			tempSeriesData.humidity = [];
-			const tempHumidity = this.state.tempHumidity;
+			let tempHumidity = this.state.tempHumidity;
 			
 			Object.keys(tempHumidity).forEach((key, index) => {
 				let tempData = [];
@@ -114,7 +125,6 @@ class Dashboard extends React.Component {
 				&& Object.keys(tempHumidity).length == index+1) {
 					this.initChart();
 				}
-				console.log(Object.keys(tempSeriesData.temperature).length);
 			});
 		}
 	}
@@ -123,6 +133,10 @@ class Dashboard extends React.Component {
 		this.refreshNode = ReactDOM.findDOMNode(this.refs.refresh);
 		this.refreshNode.classList.add('fa-spin');
 		this.props.controlsActions.getControls();
+	}
+	
+	dateFilterChange = (event, date) => {
+		this.props.tempHumidityActions.filterTempHumidity(date);
 	}
 	
 	initChart() {
@@ -134,14 +148,7 @@ class Dashboard extends React.Component {
 			credits: {
 				enabled: false
 			},
-			title: {
-				text: 'Temperature & Humidity Report',
-				style: {
-					color: 'rgba(107, 23, 142, 0.7)',
-					fontWeight: '600',
-					fontFamily: 'Roboto,sans-serif'
-				}
-			},
+			title: false,
 			xAxis: {
 				type: 'datetime',
 				tickInterval: 24 * 60 * 60 * 30
@@ -159,7 +166,6 @@ class Dashboard extends React.Component {
 			},
 			tooltip: {
 				formatter: function() {
-			document.getElementsByClassName('highcharts-credits')[0].style.display = 'hidden';
 					var text = '';
 					if(this.series.name == 'Temperature') {
 						text = '<b>' + HighCharts.numberFormat(this.y, 1) + '°C</b><br>'
@@ -200,107 +206,135 @@ class Dashboard extends React.Component {
 					<MuiThemeProvider>
 						<Card>
 							<CardText>
-								<div>
+								<div className="center">
+									<MuiThemeProvider>
+										<Subheader style={headerStyle}>
+											<i className="fa fa-thermometer-half fa-fw fa-1_5x" aria-hidden="true"></i> Temperature & Humidity Report
+										</Subheader>
+									</MuiThemeProvider>
+									<MuiThemeProvider>
+										<DatePicker
+											hintText="Filter by Date"
+											value={this.state.dateFilter}
+											onChange={this.dateFilterChange}
+											formatDate={new global.Intl.DateTimeFormat('en-US', {
+												day: 'numeric',
+												month: 'long',
+												year: 'numeric',
+												timeZone: 'Asia/Kolkata'
+											}).format}
+											textFieldStyle={dateFilterStyle}
+											autoOk={true}
+										/>
+									</MuiThemeProvider>
 									<div id="chart" style={chartStyle}></div>
 								</div>
 							</CardText>
 						</Card>
 					</MuiThemeProvider>
 					</div>
-					<br/>
+					<br/><br/>
 					<MuiThemeProvider>
-						<Subheader style={headerStyle}>
-							<i className="fa fa-cogs fa-fw fa-1_5x" aria-hidden="true"></i> Modules Status
-							<div style={refreshIconStyle}>
-								<i onClick={this.refreshState} ref="refresh" className="fa fa-refresh fa-fw fa-1_5x" aria-hidden="true"></i>
+						<Card>
+							<CardText>
+							<div>
+							<MuiThemeProvider>
+								<Subheader style={headerStyle}>
+									<i className="fa fa-cogs fa-fw fa-1_5x" aria-hidden="true"></i> Modules Status
+									<div style={refreshIconStyle}>
+										<i onClick={this.refreshState} ref="refresh" className="fa fa-refresh fa-fw fa-1_5x" aria-hidden="true"></i>
+									</div>
+								</Subheader>
+							</MuiThemeProvider>
+							<MuiThemeProvider>
+								<Card style={moduleCard}>
+									<CardText style={cardTextStyle}>
+										<MuiThemeProvider>
+											<Subheader style={desktopModules}>
+												<i className="fa fa-shower fa-fw dashboardModuleIcon" aria-hidden="true"></i> Fogger 1
+											</Subheader>
+										</MuiThemeProvider>
+										<div className={controls.foggers.foggerSide1.status ? 'moduleStatusLight moduleStatusLightON' : 'moduleStatusLight moduleStatusLightOFF'}></div>
+									</CardText>
+								</Card>
+							</MuiThemeProvider>
+							<MuiThemeProvider>
+								<Card style={moduleCard}>
+									<CardText style={cardTextStyle}>
+										<MuiThemeProvider>
+											<Subheader style={desktopModules}>
+												<i className="fa fa-shower fa-fw dashboardModuleIcon" aria-hidden="true"></i> Fogger 2
+											</Subheader>
+										</MuiThemeProvider>
+										<div className={controls.foggers.foggerSide2.status ? 'moduleStatusLight moduleStatusLightON' : 'moduleStatusLight moduleStatusLightOFF'}></div>
+									</CardText>
+								</Card>
+							</MuiThemeProvider>
+							<MuiThemeProvider>
+								<Card style={moduleCard}>
+									<CardText style={cardTextStyle}>
+										<MuiThemeProvider>
+											<Subheader style={desktopModules}>
+												<i className="fa fa-superpowers fa-fw dashboardModuleIcon" aria-hidden="true"></i> Sprinkler 1
+											</Subheader>
+										</MuiThemeProvider>
+										<div className={controls.sprinklers.sprinklerSide1.status ? 'moduleStatusLight moduleStatusLightON' : 'moduleStatusLight moduleStatusLightOFF'}></div>
+									</CardText>
+								</Card>
+							</MuiThemeProvider>
+							<MuiThemeProvider>
+								<Card style={moduleCard}>
+									<CardText style={cardTextStyle}>
+										<MuiThemeProvider>
+											<Subheader style={desktopModules}>
+												<i className="fa fa-superpowers fa-fw dashboardModuleIcon" aria-hidden="true"></i> Sprinkler 2
+											</Subheader>
+										</MuiThemeProvider>
+										<div className={controls.sprinklers.sprinklerSide2.status ? 'moduleStatusLight moduleStatusLightON' : 'moduleStatusLight moduleStatusLightOFF'}></div>
+									</CardText>
+								</Card>
+							</MuiThemeProvider>
+							<MuiThemeProvider>
+								<Card style={moduleCard}>
+									<CardText style={cardTextStyle}>
+										<MuiThemeProvider>
+											<Subheader style={desktopModules}>
+												<i className="fa fa-lightbulb-o fa-fw dashboardModuleIcon" aria-hidden="true"></i> Lights 1
+											</Subheader>
+										</MuiThemeProvider>
+										<div className={controls.lights_1.status ? 'moduleStatusLight moduleStatusLightON' : 'moduleStatusLight moduleStatusLightOFF'}></div>
+									</CardText>
+								</Card>
+							</MuiThemeProvider>
+							<MuiThemeProvider>
+								<Card style={moduleCard}>
+									<CardText style={cardTextStyle}>
+										<MuiThemeProvider>
+											<Subheader style={desktopModules}>
+												<i className="fa fa-lightbulb-o fa-fw dashboardModuleIcon" aria-hidden="true"></i> Lights 2
+											</Subheader>
+										</MuiThemeProvider>
+										<div className={controls.lights_2.status ? 'moduleStatusLight moduleStatusLightON' : 'moduleStatusLight moduleStatusLightOFF'}></div>
+									</CardText>
+								</Card>
+							</MuiThemeProvider>
+							<MuiThemeProvider>
+								<Card style={moduleCard}>
+									<CardText style={cardTextStyle}>
+										<MuiThemeProvider>
+											<Subheader style={desktopModules}>
+												<i className="fa fa-tint fa-fw dashboardModuleIcon" aria-hidden="true"></i> Water Pump
+											</Subheader>
+										</MuiThemeProvider>
+										<div className={controls.water_pump.status ? 'moduleStatusLight moduleStatusLightON' : 'moduleStatusLight moduleStatusLightOFF'}></div>
+									</CardText>
+								</Card>
+							</MuiThemeProvider>
 							</div>
-						</Subheader>
-					</MuiThemeProvider>
-					<br/>
-					<MuiThemeProvider>
-						<Card style={moduleCard}>
-							<CardText style={cardTextStyle}>
-								<MuiThemeProvider>
-									<Subheader style={desktopModules}>
-										<i className="fa fa-shower fa-fw fa-1_5x dashboardModuleIcon" aria-hidden="true"></i> Fogger 1
-									</Subheader>
-								</MuiThemeProvider>
-								<div className={controls.foggers.foggerSide1.status ? 'moduleStatusLight moduleStatusLightON' : 'moduleStatusLight moduleStatusLightOFF'}></div>
 							</CardText>
 						</Card>
 					</MuiThemeProvider>
-					<MuiThemeProvider>
-						<Card style={moduleCard}>
-							<CardText style={cardTextStyle}>
-								<MuiThemeProvider>
-									<Subheader style={desktopModules}>
-										<i className="fa fa-shower fa-fw fa-1_5x dashboardModuleIcon" aria-hidden="true"></i> Fogger 2
-									</Subheader>
-								</MuiThemeProvider>
-								<div className={controls.foggers.foggerSide2.status ? 'moduleStatusLight moduleStatusLightON' : 'moduleStatusLight moduleStatusLightOFF'}></div>
-							</CardText>
-						</Card>
-					</MuiThemeProvider>
-					<MuiThemeProvider>
-						<Card style={moduleCard}>
-							<CardText style={cardTextStyle}>
-								<MuiThemeProvider>
-									<Subheader style={desktopModules}>
-										<i className="fa fa-superpowers fa-fw fa-1_5x dashboardModuleIcon" aria-hidden="true"></i> Sprinkler 1
-									</Subheader>
-								</MuiThemeProvider>
-								<div className={controls.sprinklers.sprinklerSide1.status ? 'moduleStatusLight moduleStatusLightON' : 'moduleStatusLight moduleStatusLightOFF'}></div>
-							</CardText>
-						</Card>
-					</MuiThemeProvider>
-					<MuiThemeProvider>
-						<Card style={moduleCard}>
-							<CardText style={cardTextStyle}>
-								<MuiThemeProvider>
-									<Subheader style={desktopModules}>
-										<i className="fa fa-superpowers fa-fw fa-1_5x dashboardModuleIcon" aria-hidden="true"></i> Sprinkler 2
-									</Subheader>
-								</MuiThemeProvider>
-								<div className={controls.sprinklers.sprinklerSide2.status ? 'moduleStatusLight moduleStatusLightON' : 'moduleStatusLight moduleStatusLightOFF'}></div>
-							</CardText>
-						</Card>
-					</MuiThemeProvider>
-					<MuiThemeProvider>
-						<Card style={moduleCard}>
-							<CardText style={cardTextStyle}>
-								<MuiThemeProvider>
-									<Subheader style={desktopModules}>
-										<i className="fa fa-lightbulb-o fa-fw fa-1_5x dashboardModuleIcon" aria-hidden="true"></i> Lights 1
-									</Subheader>
-								</MuiThemeProvider>
-								<div className={controls.lights_1.status ? 'moduleStatusLight moduleStatusLightON' : 'moduleStatusLight moduleStatusLightOFF'}></div>
-							</CardText>
-						</Card>
-					</MuiThemeProvider>
-					<MuiThemeProvider>
-						<Card style={moduleCard}>
-							<CardText style={cardTextStyle}>
-								<MuiThemeProvider>
-									<Subheader style={desktopModules}>
-										<i className="fa fa-lightbulb-o fa-fw fa-1_5x dashboardModuleIcon" aria-hidden="true"></i> Lights 2
-									</Subheader>
-								</MuiThemeProvider>
-								<div className={controls.lights_2.status ? 'moduleStatusLight moduleStatusLightON' : 'moduleStatusLight moduleStatusLightOFF'}></div>
-							</CardText>
-						</Card>
-					</MuiThemeProvider>
-					<MuiThemeProvider>
-						<Card style={moduleCard}>
-							<CardText style={cardTextStyle}>
-								<MuiThemeProvider>
-									<Subheader style={desktopModules}>
-										<i className="fa fa-tint fa-fw fa-1_5x dashboardModuleIcon" aria-hidden="true"></i> Water Pump
-									</Subheader>
-								</MuiThemeProvider>
-								<div className={controls.water_pump.status ? 'moduleStatusLight moduleStatusLightON' : 'moduleStatusLight moduleStatusLightOFF'}></div>
-							</CardText>
-						</Card>
-					</MuiThemeProvider>
+					<br/><br/>
 					</div>
 				</div>
 			</App>

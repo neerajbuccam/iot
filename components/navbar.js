@@ -7,6 +7,11 @@ import MenuItem from 'material-ui/MenuItem'
 import IconButton from 'material-ui/IconButton'
 import IconMenu from 'material-ui/IconMenu'
 
+const AppBarStyle = {
+	position: 'fixed',
+	top: '0px'
+}
+
 const NavItemStyle = {
 	borderTop: '1px lightgray solid'
 };
@@ -39,6 +44,7 @@ export default class Navbar extends React.Component{
 					<AppBar title={this.props.title}
 					 titleStyle={logoTitleStyle}
 					 onLeftIconButtonTouchTap={this.handleToggle}
+					 style={AppBarStyle}
 					 iconElementRight={
 						<div>
 							<Link to="/dashboard"><IconButton iconClassName="muidocs-icon-action-home" tooltip="Dashboard" /></Link>
